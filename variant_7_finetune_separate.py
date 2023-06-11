@@ -94,6 +94,7 @@ def train(model, learning_rate, number_of_epochs, training_generator):
         print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
 
         torch.save(model.state_dict(), FINE_TUNED_MODEL_PATH)
+        torch.save(model.state_dict(), BEST_MODEL_PATH)
 
 
         # if epoch + 1 == FINETUNE_EPOCH:

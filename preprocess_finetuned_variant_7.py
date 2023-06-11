@@ -11,7 +11,7 @@ from model import VariantSeventFineTuneOnlyClassifier
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
-EMBEDDING_DIRECTORY = '../finetuned_embeddings/variant_7'
+EMBEDDING_DIRECTORY = 'finetuned_embeddings/variant_7'
 FINE_TUNED_MODEL_PATH = 'model/patch_variant_7_finetuned_model.sav'
 
 dataset_name = 'ase_dataset_sept_19_2021.csv'

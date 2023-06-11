@@ -223,16 +223,16 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
     print("AUC: {}".format(auc))
     print("-" * 32)
 
-    print("Result on Python testing dataset...")
-    precision, recall, f1, auc = predict_test_data(model=model,
-                                                   testing_generator=test_python_generator,
-                                                   device=device)
+    # print("Result on Python testing dataset...")
+    # precision, recall, f1, auc = predict_test_data(model=model,
+    #                                                testing_generator=test_python_generator,
+    #                                                device=device)
 
-    print("Precision: {}".format(precision))
-    print("Recall: {}".format(recall))
-    print("F1: {}".format(f1))
-    print("AUC: {}".format(auc))
-    print("-" * 32)
+    # print("Precision: {}".format(precision))
+    # print("Recall: {}".format(recall))
+    # print("F1: {}".format(f1))
+    # print("AUC: {}".format(auc))
+    # print("-" * 32)
 
     return model
 
@@ -274,12 +274,12 @@ def do_train():
     training_set = VariantSevenDataset(train_ids, id_to_label, id_to_url, EMBEDDING_DIRECTORY)
     val_set = VariantSevenDataset(val_ids, id_to_label, id_to_url, EMBEDDING_DIRECTORY)
     test_java_set = VariantSevenDataset(test_java_ids, id_to_label, id_to_url, EMBEDDING_DIRECTORY)
-    test_python_set = VariantSevenDataset(test_python_ids, id_to_label, id_to_url, EMBEDDING_DIRECTORY)
+    #test_python_set = VariantSevenDataset(test_python_ids, id_to_label, id_to_url, EMBEDDING_DIRECTORY)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
-    test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
+    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
 
     model = VariantSevenClassifier()
 
@@ -296,7 +296,7 @@ def do_train():
           training_generator=training_generator,
           val_generator=val_generator,
           test_java_generator=test_java_generator,
-          test_python_generator=test_python_generator)
+          test_python_generator=None)
 
 
 if __name__ == '__main__':

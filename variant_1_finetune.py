@@ -186,12 +186,12 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
             print("Early stopping")
             break
 
-        if epoch + 1 == FINETUNE_EPOCH:
-            torch.save(model.state_dict(), FINE_TUNED_MODEL_PATH)
-            if not isinstance(model, nn.DataParallel):
-                model.freeze_codebert()
-            else:
-                model.module.freeze_codebert()
+    torch.save(model.state_dict(), FINE_TUNED_MODEL_PATH)
+    if not isinstance(model, nn.DataParallel):
+        model.freeze_codebert()
+    else:
+        model.module.freeze_codebert()
+        
     return model
 
 

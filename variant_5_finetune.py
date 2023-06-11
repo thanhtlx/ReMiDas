@@ -152,12 +152,12 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         train_losses = []
         model.eval()
 
-        # print("Calculating validation loss...")
-        # val_loss = get_avg_validation_loss(model, val_generator, loss_function)
-        # print("Average validation loss of this iteration: {}".format(val_loss))
-        # print("-" * 32)
-        #
-        # early_stopping(val_loss, model)
+        print("Calculating validation loss...")
+        val_loss = get_avg_validation_loss(model, val_generator, loss_function)
+        print("Average validation loss of this iteration: {}".format(val_loss))
+        print("-" * 32)
+        
+        early_stopping(val_loss, model)
         #
         # print("Result on Java testing dataset...")
         # precision, recall, f1, auc = predict_test_data(model=model,

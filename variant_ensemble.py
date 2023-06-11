@@ -36,18 +36,6 @@ directory = os.path.dirname(os.path.abspath(__file__))
 
 model_folder_path = os.path.join(directory, 'model')
 
-
-VARIANT_ONE_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_1'
-VARIANT_TWO_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_2'
-VARIANT_THREE_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_3'
-VARIANT_FOUR_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_4'
-VARIANT_FIVE_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_5'
-VARIANT_SIX_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_6'
-VARIANT_SEVEN_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_7'
-VARIANT_EIGHT_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_8'
-VARIANT_TWO_CNN_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_2_cnn'
-VARIANT_SIX_CNN_EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_6_cnn'
-
 #change
 VARIANT_ONE_EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_1'
 VARIANT_TWO_EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_2'
