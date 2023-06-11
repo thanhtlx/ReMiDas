@@ -108,6 +108,7 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
             added_mask_list_batch = added_mask_list_batch.to(device)
             removed_input_list_batch = removed_input_list_batch.to(device)
             removed_mask_list_batch = removed_mask_list_batch.to(device)
+            label_batch= label_batch.to(device)
             outs = model(added_input_list_batch, added_mask_list_batch, removed_input_list_batch, removed_mask_list_batch)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
