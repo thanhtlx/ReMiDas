@@ -20,7 +20,7 @@ dataset_name = 'ase_dataset_sept_19_2021.csv'
 dataset_name ='test.csv'
 directory = os.path.dirname(os.path.abspath(__file__))
 
-EMBEDDINGS_DIRECTORY = '../finetuned_embeddings/variant_2'
+EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_2'
 BEST_MODEL_PATH = 'model/patch_variant_2_finetune_1_epoch_best_model.sav'
 
 model_folder_path = os.path.join(directory, 'model')
@@ -175,16 +175,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         print("AUC: {}".format(auc))
         print("-" * 32)
 
-        print("Result on Python testing dataset...")
-        precision, recall, f1, auc = predict_test_data(model=model,
-                                                       testing_generator=test_python_generator,
-                                                       device=device)
-
-        print("Precision: {}".format(precision))
-        print("Recall: {}".format(recall))
-        print("F1: {}".format(f1))
-        print("AUC: {}".format(auc))
-        print("-" * 32)
 
         if early_stopping.early_stop:
             print("Early stopping")
@@ -230,12 +220,12 @@ def do_train():
     training_set = VariantTwoDataset(train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
     val_set = VariantTwoDataset(val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
     test_java_set = VariantTwoDataset(test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_python_set = VariantTwoDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    #test_python_set = VariantTwoDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantTwoClassifier()
 
@@ -252,7 +242,7 @@ def do_train():
           training_generator=training_generator,
           val_generator=val_generator,
           test_java_generator=test_java_generator,
-          test_python_generator=test_python_generator)
+          test_python_generator=None)
 
 
 if __name__ == '__main__':

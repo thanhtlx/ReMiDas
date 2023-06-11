@@ -260,7 +260,7 @@ def do_train():
     training_generator = DataLoader(training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
-    test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
+    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
 
     model = VariantThreeClassifier()
 

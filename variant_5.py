@@ -234,12 +234,12 @@ def do_train():
     training_set = VariantFiveDataset(train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
     val_set = VariantFiveDataset(val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
     test_java_set = VariantFiveDataset(test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_python_set = VariantFiveDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    #test_python_set = VariantFiveDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_java_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantFiveClassifier()
 
@@ -256,7 +256,7 @@ def do_train():
           training_generator=training_generator,
           val_generator= val_java_generator,
           test_java_generator=test_java_generator,
-          test_python_generator=test_python_generator)
+          test_python_generator=None)
 
 
 if __name__ == '__main__':
