@@ -10,7 +10,7 @@ from model import VariantEightFineTuneOnlyClassifier
 import matplotlib.pyplot as plt
 
 
-EMBEDDING_DIRECTORY = '../finetuned_embeddings/variant_8'
+EMBEDDING_DIRECTORY = 'finetuned_embeddings/variant_8'
 FINE_TUNED_MODEL_PATH = 'model/patch_variant_8_finetuned_model.sav'
 
 directory = os.path.dirname(os.path.abspath(__file__))
