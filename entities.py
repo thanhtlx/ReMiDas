@@ -9,11 +9,14 @@ file_data_folder_name = 'variant_file_data'
 
 directory = os.path.dirname(os.path.abspath(__file__))
 tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
-code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+code_bert = RobertaModel.from_pretrained(
+    "microsoft/codebert-base", num_labels=2)
 empty_code = tokenizer.sep_token + ''
-inputs = tokenizer([empty_code], padding=True, max_length=512, truncation=True, return_tensors="pt")
+inputs = tokenizer([empty_code], padding=True, max_length=512,
+                   truncation=True, return_tensors="pt")
 input_ids, attention_mask = inputs.data['input_ids'], inputs.data['attention_mask']
-empty_embedding = code_bert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[0, 0, :].tolist()
+empty_embedding = code_bert(
+    input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[0, 0, :].tolist()
 
 # def get_average_value(embeddings):
 #     embeddings = torch.FloatTensor(embeddings)
@@ -23,6 +26,7 @@ empty_embedding = code_bert(input_ids=input_ids, attention_mask=attention_mask).
 #     mean_ = mean_.cpu()
 #
 #     return mean_
+
 
 class VariantSixDataset(Dataset):
     def __init__(self, list_IDs, labels, id_to_url, embedding_directory):
@@ -38,7 +42,9 @@ class VariantSixDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
 
@@ -74,7 +80,8 @@ class PatchDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, '../file_data/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, '../file_data/' + url.replace('/', '_') + '.txt')
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -110,14 +117,14 @@ class HunkDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, '../' + hunk_data_folder_name + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, '../' + hunk_data_folder_name + '/' + url.replace('/', '_') + '.txt')
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
 
         before = data['before']
         after = data['after']
-
 
         y = self.labels[id]
 
@@ -136,7 +143,8 @@ class LineDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, '../' + file_data_folder_name + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, '../' + file_data_folder_name + '/' + url.replace('/', '_') + '.txt')
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -161,7 +169,9 @@ class VariantOneDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -187,7 +197,9 @@ class VariantTwoDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -220,7 +232,9 @@ class VariantThreeFcnDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -252,7 +266,9 @@ class VariantFiveDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -281,7 +297,9 @@ class VariantThreeDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -290,7 +308,7 @@ class VariantThreeDataset(Dataset):
         y = self.labels[id]
 
         return int(id), url, hunk_embeddings, y
-        
+
 
 class VariantSevenDataset(Dataset):
     def __init__(self, list_IDs, labels, id_to_url, embedding_directory):
@@ -305,8 +323,10 @@ class VariantSevenDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
-
+        # file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
 
@@ -337,7 +357,9 @@ class VariantEightDataset(Dataset):
     def __getitem__(self, index):
         id = self.list_IDs[index]
         url = self.id_to_url[id]
-        file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(directory, self.embedding_directory)
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
+        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -422,7 +444,7 @@ class VariantTwoFineTuneDataset(Dataset):
         y = self.labels[id]
 
         return int(id), url, input_id_list, mask_list, y
-        
+
 
 class VariantSixFineTuneDataset(Dataset):
     def __init__(self, list_IDs, labels, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list):
@@ -448,6 +470,7 @@ class VariantSixFineTuneDataset(Dataset):
         y = self.labels[id]
 
         return int(id), url, added_input_list, added_mask_list, removed_input_list, removed_mask_list, y
+
 
 class VariantThreeFineTuneDataset(Dataset):
     def __init__(self, list_IDs, labels, id_to_url, id_to_input_list, id_to_mask_list):
