@@ -44,7 +44,7 @@ class VariantSixDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
+
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
 
@@ -171,7 +171,6 @@ class VariantOneDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -199,7 +198,6 @@ class VariantTwoDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -234,7 +232,6 @@ class VariantThreeFcnDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -268,7 +265,6 @@ class VariantFiveDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -299,7 +295,6 @@ class VariantThreeDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
@@ -326,7 +321,7 @@ class VariantSevenDataset(Dataset):
         # file_path = os.path.join(directory, self.embedding_directory + '/' + url.replace('/', '_') + '.txt')
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
+
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
 
@@ -359,7 +354,6 @@ class VariantEightDataset(Dataset):
         url = self.id_to_url[id]
         file_path = os.path.join(directory, self.embedding_directory)
         file_path = file_path + '/' + url.replace('/', '_') + '.txt'
-        json.dump(data, open(file_path, 'w'))
 
         with open(file_path, 'r') as reader:
             data = json.loads(reader.read())
