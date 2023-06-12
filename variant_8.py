@@ -196,8 +196,9 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             #     print("{:>30}: {:>8}".format(name, sizeof_fmt(size)))
             before_batch, after_batch, label_batch \
                 = before_batch.to(device), after_batch.to(device), label_batch.to(device)
-            print(torch.cuda.mem_get_info)
-            print(torch.cuda.memory_summary)
+            print(torch.cuda.mem_get_info())
+            print(torch.cuda.memory_summary())
+            print(before_batch, after_batch)
             outs = model(before_batch, after_batch)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
@@ -210,9 +211,8 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             del before_batch, after_batch, outs
             gc.collect()
             torch.cuda.empty_cache()
-            print(id_batch)
-            print(torch.cuda.mem_get_info)
-            print(torch.cuda.memory_summary)
+            print(torch.cuda.mem_get_info())
+            print(torch.cuda.memory_summary())
 
             current_batch += 1
             if current_batch % 50 == 0:
