@@ -34,11 +34,11 @@ VALIDATION_BATCH_SIZE = 64
 TEST_BATCH_SIZE = 64
 
 TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
-                'shuffle': True, 'num_workers': 8}
+                'shuffle': True, 'num_workers': 2}
 VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
-                     'shuffle': True, 'num_workers': 8}
+                     'shuffle': True, 'num_workers': 2}
 TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
-               'shuffle': True, 'num_workers': 8}
+               'shuffle': True, 'num_workers': 2}
 
 LEARNING_RATE = 1e-5
 
