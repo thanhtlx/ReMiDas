@@ -17,7 +17,7 @@ import utils
 
 # dataset_name = 'ase_dataset_sept_19_2021.csv'
 dataset_name = 'huawei_sub_dataset.csv'
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 directory = os.path.dirname(os.path.abspath(__file__))
 
 model_folder_path = os.path.join(directory, 'model')
@@ -32,9 +32,12 @@ TRAIN_BATCH_SIZE = 128
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 
@@ -85,7 +88,8 @@ def predict_test_data(model, testing_generator, device, need_prob=False, need_fe
     with torch.no_grad():
         model.eval()
         for ids, url, hunk_batch, label_batch in tqdm(testing_generator):
-            hunk_batch, label_batch = hunk_batch.to(device), label_batch.to(device)
+            hunk_batch, label_batch = hunk_batch.to(
+                device), label_batch.to(device)
 
             outs = model(hunk_batch, need_final_feature=need_feature_only)
             if need_feature_only:
@@ -129,8 +133,6 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
             loss = loss_function(outs, label_batch)
             validation_loss += loss
 
-
-
     avg_val_los = validation_loss / len(validation_generator)
 
     return avg_val_los
@@ -173,7 +175,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
 
         train_losses = []
         model.eval()
@@ -252,15 +255,22 @@ def do_train():
         id_to_label[index] = label_data['test_python'][i]
         index += 1
 
-    training_set = VariantThreeDataset(train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    val_set = VariantThreeDataset(val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_java_set = VariantThreeDataset(test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_python_set = VariantThreeDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    training_set = VariantThreeDataset(
+        train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    val_set = VariantThreeDataset(
+        val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    test_java_set = VariantThreeDataset(
+        test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    test_python_set = VariantThreeDataset(
+        test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
 
-    training_generator = DataLoader(training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
-    val_generator = DataLoader(val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
-    test_java_generator = DataLoader(test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
-    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
+    training_generator = DataLoader(
+        training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
+    val_generator = DataLoader(
+        val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
+    test_java_generator = DataLoader(
+        test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
+    # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
 
     model = VariantThreeClassifier()
 
@@ -277,7 +287,7 @@ def do_train():
           training_generator=training_generator,
           val_generator=val_generator,
           test_java_generator=test_java_generator,
-          test_python_generator=test_python_generator)
+          test_python_generator=None)
 
 
 if __name__ == '__main__':
