@@ -1,3 +1,4 @@
+import pathlib
 from transformers import RobertaTokenizer, RobertaModel
 import pandas as pd
 import json
@@ -17,10 +18,11 @@ directory = os.path.dirname(os.path.abspath(__file__))
 
 dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset_new.csv'
-import pathlib
-dataset_name ='big_vf.csv'
-dataset_name ='test.csv'
+dataset_name = 'big_vf.csv'
+dataset_name = 'test.csv'
+# change 32
 CODE_LINE_LENGTH = 64
+CODE_LINE_LENGTH = 32
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -32,7 +34,8 @@ torch.backends.cudnn.benchmark = True
 
 
 def get_input_and_mask(tokenizer, code_list):
-    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH,
+                       truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -54,12 +57,14 @@ def get_code_version(diff, added_version):
 
 
 def get_embeddings(code_list, start, length, tokenizer, codebert):
-    input_ids, attention_mask = get_input_and_mask(tokenizer, code_list[start: start + length])
+    input_ids, attention_mask = get_input_and_mask(
+        tokenizer, code_list[start: start + length])
 
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        embeddings = codebert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        embeddings = codebert(
+            input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
     embeddings = embeddings.tolist()
 
     return embeddings
@@ -73,10 +78,12 @@ def get_line_embeddings(code_list, tokenizer, code_bert):
     index = 0
     length_limit = 100
     while index + length_limit < len(code_list):
-        embeddings.extend(get_embeddings(code_list, index, length_limit, tokenizer, code_bert))
+        embeddings.extend(get_embeddings(code_list, index,
+                          length_limit, tokenizer, code_bert))
         index = index + length_limit
 
-    embeddings.extend(get_embeddings(code_list, index, len(code_list) - index, tokenizer, code_bert))
+    embeddings.extend(get_embeddings(code_list, index, len(
+        code_list) - index, tokenizer, code_bert))
     # process all lines in one
 
     return embeddings
@@ -128,7 +135,7 @@ def write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_
     for url, data in url_to_data.items():
         file_path = os.path.join(directory, EMBEDDING_DIRECTORY)
         pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
-        file_path =  file_path + '/' + url.replace('/', '_') + '.txt'
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
         json.dump(data, open(file_path, 'w'))
 
 
@@ -141,7 +148,7 @@ def get_data():
         model = nn.DataParallel(model)
 
     model.load_state_dict(torch.load(FINE_TUNED_MODEL_PATH))
-    #change
+    # change
     code_bert = model.code_bert
 
     if torch.cuda.device_count() > 1:
@@ -154,7 +161,8 @@ def get_data():
 
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -175,15 +183,18 @@ def get_data():
     removed_url_list = []
     added_url_list = []
     for url, diff in tqdm.tqdm(url_to_diff.items()):
-        file_path = os.path.join(directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
             continue
 
         removed_code = get_code_version(diff, False)
         added_code = get_code_version(diff, True)
 
-        new_removed_code_list = get_line_from_code(tokenizer.sep_token, removed_code)
-        new_added_code_list = get_line_from_code(tokenizer.sep_token, added_code)
+        new_removed_code_list = get_line_from_code(
+            tokenizer.sep_token, removed_code)
+        new_added_code_list = get_line_from_code(
+            tokenizer.sep_token, added_code)
 
         for i in range(len(new_removed_code_list)):
             removed_url_list.append(url)
@@ -195,10 +206,13 @@ def get_data():
         added_code_list.extend(new_added_code_list)
 
         if len(removed_code_list) >= 500 or len(added_code_list) >= 500:
-            removed_embeddings = get_line_embeddings(removed_code_list, tokenizer, code_bert)
-            added_embeddings = get_line_embeddings(added_code_list, tokenizer, code_bert)
+            removed_embeddings = get_line_embeddings(
+                removed_code_list, tokenizer, code_bert)
+            added_embeddings = get_line_embeddings(
+                added_code_list, tokenizer, code_bert)
 
-            write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_list, added_url_list)
+            write_embeddings_to_files(
+                removed_embeddings, added_embeddings, removed_url_list, added_url_list)
 
             removed_code_list = []
             added_code_list = []
@@ -206,9 +220,12 @@ def get_data():
             added_url_list = []
 
     if len(removed_code_list) > 0 or len(added_code_list) > 0:
-        removed_embeddings = get_line_embeddings(removed_code_list, tokenizer, code_bert)
-        added_embeddings = get_line_embeddings(added_code_list, tokenizer, code_bert)
-        write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_list, added_url_list)
+        removed_embeddings = get_line_embeddings(
+            removed_code_list, tokenizer, code_bert)
+        added_embeddings = get_line_embeddings(
+            added_code_list, tokenizer, code_bert)
+        write_embeddings_to_files(
+            removed_embeddings, added_embeddings, removed_url_list, added_url_list)
 
 
 if __name__ == '__main__':

@@ -20,7 +20,7 @@ import preprocess_variant_1
 
 # dataset_name = 'ase_dataset_sept_19_2021.csv'
 dataset_name = 'huawei_sub_dataset.csv'
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 directory = os.path.dirname(os.path.abspath(__file__))
 
 model_folder_path = os.path.join(directory, 'model')
@@ -37,9 +37,12 @@ TRAIN_BATCH_SIZE = 128
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 
@@ -48,7 +51,9 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 torch.backends.cudnn.benchmark = True
 
 false_cases = []
+# change
 CODE_LENGTH = 64
+CODE_LENGTH = 32
 HIDDEN_DIM = 768
 
 NUMBER_OF_LABELS = 2
@@ -88,7 +93,8 @@ def train(model, learning_rate, number_of_epochs, training_generator):
                 print("Train commit iter {}, commit {}/{} total loss {}, average loss {}"
                       .format(current_batch, (index + 1) * TRAIN_BATCH_SIZE, len(training_generator) * TRAIN_BATCH_SIZE, np.sum(train_losses), np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
 
         torch.save(model.state_dict(), FINE_TUNED_MODEL_PATH)
         torch.save(model.state_dict(), BEST_MODEL_PATH)
@@ -109,7 +115,8 @@ def get_data():
 
     tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
 
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -132,8 +139,10 @@ def get_data():
         removed_code = preprocess_variant_8.get_code_version(diff, False)
         added_code = preprocess_variant_8.get_code_version(diff, True)
 
-        new_removed_code_list = preprocess_variant_8.get_line_from_code(tokenizer.sep_token, removed_code)
-        new_added_code_list = preprocess_variant_8.get_line_from_code(tokenizer.sep_token, added_code)
+        new_removed_code_list = preprocess_variant_8.get_line_from_code(
+            tokenizer.sep_token, removed_code)
+        new_added_code_list = preprocess_variant_8.get_line_from_code(
+            tokenizer.sep_token, added_code)
 
         url_to_diff[url].extend(new_removed_code_list)
         url_to_diff[url].extend(new_added_code_list)
@@ -166,7 +175,8 @@ def get_data():
                 label_test_python.append(label)
                 url_test_python.append(url)
             else:
-                raise Exception("Invalid programming language: {}".format(partition))
+                raise Exception(
+                    "Invalid programming language: {}".format(partition))
         elif partition == 'val':
             patch_val.append(diff)
             label_val.append(label)
@@ -188,7 +198,8 @@ def get_data():
 
 
 def get_input_and_mask(tokenizer, code):
-    inputs = tokenizer(code, padding='max_length', max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code, padding='max_length',
+                       max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -239,10 +250,12 @@ def do_train():
     all_url = url_data['train']
 
     print("Preparing commit patch data...")
-    id_to_input, id_to_mask, id_to_label, id_to_url = retrieve_patch_data(all_data, all_label, all_url)
+    id_to_input, id_to_mask, id_to_label, id_to_url = retrieve_patch_data(
+        all_data, all_label, all_url)
     print("Finish preparing commit patch data")
 
-    training_set = VariantEightFineTuneOnlyDataset(train_ids, id_to_label, id_to_url, id_to_input, id_to_mask)
+    training_set = VariantEightFineTuneOnlyDataset(
+        train_ids, id_to_label, id_to_url, id_to_input, id_to_mask)
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
 
     model = VariantEightFineTuneOnlyClassifier()

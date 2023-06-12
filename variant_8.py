@@ -225,17 +225,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
     print("AUC: {}".format(auc))
     print("-" * 32)
 
-    # print("Result on Python testing dataset...")
-    # precision, recall, f1, auc = predict_test_data(model=model,
-    #                                                testing_generator=test_python_generator,
-    #                                                device=device)
-
-    # print("Precision: {}".format(precision))
-    # print("Recall: {}".format(recall))
-    # print("F1: {}".format(f1))
-    # print("AUC: {}".format(auc))
-    # print("-" * 32)
-
     return model
 
 
@@ -265,12 +254,6 @@ def do_train():
         test_java_ids.append(index)
         id_to_url[index] = url
         id_to_label[index] = label_data['test_java'][i]
-        index += 1
-
-    for i, url in enumerate(url_data['test_python']):
-        test_python_ids.append(index)
-        id_to_url[index] = url
-        id_to_label[index] = label_data['test_python'][i]
         index += 1
 
     training_set = VariantEightDataset(
