@@ -167,7 +167,7 @@ def sizeof_fmt(num, suffix='B'):
         num /= 1024.0
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
-
+import gc
 def train(learning_rate, number_of_epochs, training_generator, val_generator, test_java_generator, test_python_generator):
     model = VariantEightClassifier()
     model.to(device)
@@ -207,7 +207,9 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             lr_scheduler.step()
             total_loss += loss.detach().item()
             del before_batch, after_batch, outs
+            gc.collect()
             torch.cuda.empty_cache()
+            print(id_batch)
 
             current_batch += 1
             if current_batch % 50 == 0:
