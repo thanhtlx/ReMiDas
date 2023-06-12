@@ -43,7 +43,7 @@ def get_file_to_manual_map():
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    for line in lines:
+    for line in lines[:100]:
         mark = '+'
         if not added_version:
             mark = '-'

@@ -171,17 +171,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         print("AUC: {}".format(auc))
         print("-" * 32)
 
-        # print("Result on Python testing dataset...")
-        # precision, recall, f1, auc = predict_test_data(model=model,
-        #                                                testing_generator=test_python_generator,
-        #                                                device=device)
-
-        # print("Precision: {}".format(precision))
-        # print("Recall: {}".format(recall))
-        # print("F1: {}".format(f1))
-        # print("AUC: {}".format(auc))
-        # print("-" * 32)
-
         if early_stopping.early_stop:
             print("Early stopping")
             break
@@ -271,10 +260,6 @@ def get_data():
                 patch_test_java.append(diff)
                 label_test_java.append(label)
                 url_test_java.append(url)
-            elif pl == 'python':
-                patch_test_python.append(diff)
-                label_test_python.append(label)
-                url_test_python.append(url)
             else:
                 raise Exception("Invalid programming language: {}".format(partition))
         elif partition == 'val':
@@ -315,10 +300,6 @@ def do_train():
 
     for i in range(len(patch_data['test_java'])):
         test_java_ids.append(index)
-        index += 1
-
-    for i in range(len(patch_data['test_python'])):
-        test_python_ids.append(index)
         index += 1
 
     all_data = patch_data['train'] + patch_data['val'] + patch_data['test_java'] + patch_data['test_python']

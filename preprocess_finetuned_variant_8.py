@@ -22,7 +22,7 @@ dataset_name = 'big_vf.csv'
 dataset_name = 'test.csv'
 # change 32
 CODE_LINE_LENGTH = 64
-CODE_LINE_LENGTH = 16
+
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -43,7 +43,10 @@ def get_input_and_mask(tokenizer, code_list):
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    for line in lines:
+    #change
+    # for line in lines:
+    # limit line: fix out of memory incase very large line >150 line
+    for line in lines[:150]:
         mark = '+'
         if not added_version:
             mark = '-'
@@ -204,7 +207,7 @@ def get_data():
 
         removed_code_list.extend(new_removed_code_list)
         added_code_list.extend(new_added_code_list)
-
+        # doan nay giup cho giam memory thoi
         if len(removed_code_list) >= 500 or len(added_code_list) >= 500:
             removed_embeddings = get_line_embeddings(
                 removed_code_list, tokenizer, code_bert)

@@ -30,7 +30,9 @@ torch.backends.cudnn.benchmark = True
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    for line in lines:
+    # change
+    # for line in lines
+    for line in lines[:150]:
         mark = '+'
         if not added_version:
             mark = '-'

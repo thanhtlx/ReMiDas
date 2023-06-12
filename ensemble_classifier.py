@@ -201,16 +201,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, test_java_
 
     write_prob_to_file(JAVA_RESULT_PATH, urls, probs)
 
-    # print("Result on Python testing dataset...")
-    # precision, recall, f1, auc, urls, probs, features = predict_test_data(model=model,
-    #                                             testing_generator=test_python_generator,
-    #                                             device=device, need_prob=True)
-        
-    # print("Precision: {}".format(precision))
-    # print("Recall: {}".format(recall))
-    # print("F1: {}".format(f1))
-    # print("AUC: {}".format(auc))
-    # print("-" * 32)
 
     write_prob_to_file(PYTHON_RESULT_PATH, urls, probs)
 
