@@ -159,15 +159,6 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
     return avg_val_los
 
 
-def sizeof_fmt(num, suffix='B'):
-    ''' by Fred Cirera,  https://stackoverflow.com/a/1094933/1870254, modified'''
-    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
-        if abs(num) < 1024.0:
-            return "%3.1f %s%s" % (num, unit, suffix)
-        num /= 1024.0
-    return "%.1f %s%s" % (num, 'Yi', suffix)
-
-import gc
 def train(learning_rate, number_of_epochs, training_generator, val_generator, test_java_generator, test_python_generator):
     model = VariantEightClassifier()
     model.to(device)
@@ -191,15 +182,8 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
         total_loss = 0
         current_batch = 0
         for id_batch, url_batch, before_batch, after_batch, label_batch in training_generator:
-            # for name, size in sorted(((name, sys.getsizeof(value)) for name, value in list(
-            #         locals().items())), key=lambda x: -x[1]):
-            #     print("{:>30}: {:>8}".format(name, sizeof_fmt(size)))
             before_batch, after_batch, label_batch \
                 = before_batch.to(device), after_batch.to(device), label_batch.to(device)
-            print(torch.cuda.mem_get_info())
-            print(torch.cuda.memory_summary())
-            print(before_batch, after_batch)
-            print(before_batch.shape,after_batch.shape)
             outs = model(before_batch, after_batch)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
@@ -209,12 +193,6 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             optimizer.step()
             lr_scheduler.step()
             total_loss += loss.detach().item()
-            del before_batch, after_batch, outs
-            gc.collect()
-            torch.cuda.empty_cache()
-            print(torch.cuda.mem_get_info())
-            print(torch.cuda.memory_summary())
-
             current_batch += 1
             if current_batch % 50 == 0:
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
