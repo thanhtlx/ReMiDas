@@ -19,9 +19,9 @@ from tqdm import tqdm
 # dataset_name = 'huawei_csv_subset_slicing_limited_10.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
 dataset_name = 'ase_dataset_sept_19_2021.csv'
-#change
-dataset_name ='big_vf.csv'
-dataset_name ='test.csv'
+# change
+dataset_name = 'big_vf.csv'
+dataset_name = 'test.csv'
 
 EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_1'
 
@@ -36,9 +36,12 @@ TRAIN_BATCH_SIZE = 128
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 EARLY_STOPPING_ROUND = 5
@@ -105,7 +108,7 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
     validation_loss = 0
     with torch.no_grad():
         for id_batch, url_batch, embedding_batch, label_batch in validation_generator:
-            #change
+            # change
             embedding_batch, label_batch \
                 = embedding_batch.to(device), label_batch.to(device)
             outs = model(embedding_batch)
@@ -156,7 +159,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
         train_losses = []
 
         model.eval()
@@ -236,17 +240,21 @@ def do_train():
         id_to_label[index] = label_data['test_python'][i]
         index += 1
 
-    training_set = VariantOneDataset(train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    val_set = VariantOneDataset(val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_java_set = VariantOneDataset(test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    #test_python_set = VariantOneDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    training_set = VariantOneDataset(
+        train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    val_set = VariantOneDataset(
+        val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    test_java_set = VariantOneDataset(
+        test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    # test_python_set = VariantOneDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_java_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantOneClassifier()
+    print(model)
 
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")

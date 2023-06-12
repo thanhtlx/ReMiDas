@@ -18,7 +18,7 @@ import utils
 dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
 directory = os.path.dirname(os.path.abspath(__file__))
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 model_folder_path = os.path.join(directory, 'model')
 
 EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_6'
@@ -31,15 +31,19 @@ TRAIN_BATCH_SIZE = 128
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 torch.backends.cudnn.benchmark = True
+
 
 def predict_test_data(model, testing_generator, device, need_prob=False, need_feature_only=False):
     y_pred = []
@@ -50,8 +54,10 @@ def predict_test_data(model, testing_generator, device, need_prob=False, need_fe
     with torch.no_grad():
         model.eval()
         for ids, url_batch, before_batch, after_batch, label_batch in tqdm(testing_generator):
-            before_batch, after_batch, label_batch = before_batch.to(device), after_batch.to(device), label_batch.to(device)
-            outs = model(before_batch, after_batch, need_final_feature=need_feature_only)
+            before_batch, after_batch, label_batch = before_batch.to(
+                device), after_batch.to(device), label_batch.to(device)
+            outs = model(before_batch, after_batch,
+                         need_final_feature=need_feature_only)
 
             if need_feature_only:
                 final_features.extend(outs[1].tolist())
@@ -80,6 +86,7 @@ def predict_test_data(model, testing_generator, device, need_prob=False, need_fe
         return precision, recall, f1, auc
     else:
         return precision, recall, f1, auc, urls, probs
+
 
 def get_avg_validation_loss(model, validation_generator, loss_function):
     validation_loss = 0
@@ -134,7 +141,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
         train_losses = []
         model.eval()
 
@@ -159,8 +167,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         print("F1: {}".format(f1))
         print("AUC: {}".format(auc))
         print("-" * 32)
-
-
 
         if early_stopping.early_stop:
             print("Early stopping")
@@ -203,17 +209,21 @@ def do_train():
         id_to_label[index] = label_data['test_python'][i]
         index += 1
 
-    training_set = VariantSixDataset(train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    val_set = VariantSixDataset(val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    test_java_set = VariantSixDataset(test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
-    #test_python_set = VariantSixDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    training_set = VariantSixDataset(
+        train_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    val_set = VariantSixDataset(
+        val_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    test_java_set = VariantSixDataset(
+        test_java_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
+    # test_python_set = VariantSixDataset(test_python_ids, id_to_label, id_to_url, EMBEDDINGS_DIRECTORY)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantSixClassifier()
+    print(model)
 
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")

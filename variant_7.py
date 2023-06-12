@@ -301,6 +301,7 @@ def do_train():
         model = nn.DataParallel(model)
 
     model.to(device)
+    print(model)
 
     train(model=model,
           learning_rate=LEARNING_RATE,

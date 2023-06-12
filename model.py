@@ -5,6 +5,7 @@ import numpy as np
 from torch.nn import functional as F
 from torch.autograd import Variable
 
+
 class PatchClassifier(nn.Module):
     def __init__(self):
         super(PatchClassifier, self).__init__()
@@ -73,23 +74,22 @@ class CnnClassifier(nn.Module):
         x_reshaped_before = x_embed_before.permute(0, 2, 1)
 
         # Apply CNN and ReLU. Output shape: (b, num_filters[i], L_out)
-        x_conv_list_before = [F.relu(conv1d(x_reshaped_before)) for conv1d in self.conv1d_list]
+        x_conv_list_before = [F.relu(conv1d(x_reshaped_before))
+                              for conv1d in self.conv1d_list]
 
         # Max pooling. Output shape: (b, num_filters[i], 1)
         x_pool_list_before = [F.max_pool1d(x_conv, kernel_size=x_conv.shape[2])
-                       for x_conv in x_conv_list_before]
+                              for x_conv in x_conv_list_before]
 
         # Concatenate x_pool_list to feed the fully connected layer.
         # Output shape: (b, sum(num_filters))
         x_fc_before = torch.cat([x_pool.squeeze(dim=2) for x_pool in x_pool_list_before],
-                         dim=1)
+                                dim=1)
 
         # # Compute logits. Output shape: (b, n_classes)
         # out = self.fc(self.dropout(x_fc_before))
 
-
         ############################################
-
 
         x_embed_after = after_batch
 
@@ -98,16 +98,17 @@ class CnnClassifier(nn.Module):
         x_reshaped_after = x_embed_after.permute(0, 2, 1)
 
         # Apply CNN and ReLU. Output shape: (b, num_filters[i], L_out)
-        x_conv_list_after = [F.relu(conv1d(x_reshaped_after)) for conv1d in self.conv1d_list]
+        x_conv_list_after = [F.relu(conv1d(x_reshaped_after))
+                             for conv1d in self.conv1d_list]
 
         # Max pooling. Output shape: (b, num_filters[i], 1)
         x_pool_list_after = [F.max_pool1d(x_conv, kernel_size=x_conv.shape[2])
-                       for x_conv in x_conv_list_after]
+                             for x_conv in x_conv_list_after]
 
         # Concatenate x_pool_list to feed the fully connected layer.
         # Output shape: (b, sum(num_filters))
         x_fc_after = torch.cat([x_pool.squeeze(dim=2) for x_pool in x_pool_list_after],
-                         dim=1)
+                               dim=1)
 
         # Compute logits. Output shape: (b, n_classes)
 
@@ -151,14 +152,16 @@ class VariantTwoFineTuneClassifier(nn.Module):
     def __init__(self):
         super(VariantTwoFineTuneClassifier, self).__init__()
         self.HIDDEN_DIM = 768
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
         self.classifier = VariantTwoClassifier()
 
     def forward(self, input_list_batch, mask_list_batch):
         d1, d2, d3 = input_list_batch.shape
         input_list_batch = torch.reshape(input_list_batch, (d1 * d2, d3))
         mask_list_batch = torch.reshape(mask_list_batch, (d1 * d2, d3))
-        embeddings = self.code_bert(input_ids=input_list_batch, attention_mask=mask_list_batch).last_hidden_state[:, 0, :]
+        embeddings = self.code_bert(
+            input_ids=input_list_batch, attention_mask=mask_list_batch).last_hidden_state[:, 0, :]
         embeddings = torch.reshape(embeddings, (d1, d2, self.HIDDEN_DIM))
 
         out = self.classifier(embeddings)
@@ -254,7 +257,8 @@ class VariantThreeClassifier(nn.Module):
         x_reshaped = x_embed.permute(0, 2, 1)
 
         # Apply CNN and ReLU. Output shape: (b, num_filters[i], L_out)
-        x_conv_list = [F.relu(conv1d(x_reshaped)) for conv1d in self.conv1d_list]
+        x_conv_list = [F.relu(conv1d(x_reshaped))
+                       for conv1d in self.conv1d_list]
 
         # Max pooling. Output shape: (b, num_filters[i], 1)
         x_pool_list = [F.max_pool1d(x_conv, kernel_size=x_conv.shape[2])
@@ -280,14 +284,16 @@ class VariantThreeFineTuneClassifier(nn.Module):
     def __init__(self):
         super(VariantThreeFineTuneClassifier, self).__init__()
         self.HIDDEN_DIM = 768
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
         self.classifier = VariantThreeClassifier()
 
     def forward(self, input_list_batch, mask_list_batch):
         d1, d2, d3 = input_list_batch.shape
         input_list_batch = torch.reshape(input_list_batch, (d1 * d2, d3))
         mask_list_batch = torch.reshape(mask_list_batch, (d1 * d2, d3))
-        embeddings = self.code_bert(input_ids=input_list_batch, attention_mask=mask_list_batch).last_hidden_state[:, 0, :]
+        embeddings = self.code_bert(
+            input_ids=input_list_batch, attention_mask=mask_list_batch).last_hidden_state[:, 0, :]
         embeddings = torch.reshape(embeddings, (d1, d2, self.HIDDEN_DIM))
 
         out = self.classifier(embeddings)
@@ -311,7 +317,8 @@ class VariantThreeFineTuneOnlyClassifier(nn.Module):
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.NUMBER_OF_LABELS = 2
 
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
 
         self.linear = nn.Linear(self.HIDDEN_DIM, self.DENSE_DIM)
         self.relu = nn.ReLU()
@@ -319,7 +326,8 @@ class VariantThreeFineTuneOnlyClassifier(nn.Module):
         self.out_proj = nn.Linear(self.DENSE_DIM, self.NUMBER_OF_LABELS)
 
     def forward(self, input_batch, mask_batch):
-        embeddings = self.code_bert(input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
+        embeddings = self.code_bert(
+            input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
 
         x = embeddings
         x = self.drop_out(x)
@@ -329,6 +337,7 @@ class VariantThreeFineTuneOnlyClassifier(nn.Module):
         x = self.out_proj(x)
 
         return x
+
 
 class VariantSevenClassifier(nn.Module):
     """An 1D Convulational Neural Network for Sentence Classification."""
@@ -374,23 +383,22 @@ class VariantSevenClassifier(nn.Module):
         x_reshaped_before = x_embed_before.permute(0, 2, 1)
 
         # Apply CNN and ReLU. Output shape: (b, num_filters[i], L_out)
-        x_conv_list_before = [F.relu(conv1d(x_reshaped_before)) for conv1d in self.conv1d_list]
+        x_conv_list_before = [F.relu(conv1d(x_reshaped_before))
+                              for conv1d in self.conv1d_list]
 
         # Max pooling. Output shape: (b, num_filters[i], 1)
         x_pool_list_before = [F.max_pool1d(x_conv, kernel_size=x_conv.shape[2])
-                       for x_conv in x_conv_list_before]
+                              for x_conv in x_conv_list_before]
 
         # Concatenate x_pool_list to feed the fully connected layer.
         # Output shape: (b, sum(num_filters))
         x_fc_before = torch.cat([x_pool.squeeze(dim=2) for x_pool in x_pool_list_before],
-                         dim=1)
+                                dim=1)
 
         # # Compute logits. Output shape: (b, n_classes)
         # out = self.fc(self.dropout(x_fc_before))
 
-
         ############################################
-
 
         x_embed_after = after_batch
 
@@ -399,16 +407,17 @@ class VariantSevenClassifier(nn.Module):
         x_reshaped_after = x_embed_after.permute(0, 2, 1)
 
         # Apply CNN and ReLU. Output shape: (b, num_filters[i], L_out)
-        x_conv_list_after = [F.relu(conv1d(x_reshaped_after)) for conv1d in self.conv1d_list]
+        x_conv_list_after = [F.relu(conv1d(x_reshaped_after))
+                             for conv1d in self.conv1d_list]
 
         # Max pooling. Output shape: (b, num_filters[i], 1)
         x_pool_list_after = [F.max_pool1d(x_conv, kernel_size=x_conv.shape[2])
-                       for x_conv in x_conv_list_after]
+                             for x_conv in x_conv_list_after]
 
         # Concatenate x_pool_list to feed the fully connected layer.
         # Output shape: (b, sum(num_filters))
         x_fc_after = torch.cat([x_pool.squeeze(dim=2) for x_pool in x_pool_list_after],
-                         dim=1)
+                               dim=1)
 
         # Compute logits. Output shape: (b, n_classes)
 
@@ -450,15 +459,18 @@ class VariantOneClassifier(nn.Module):
         else:
             return x
 
+
 class VariantOneFinetuneClassifier(nn.Module):
     def __init__(self):
         super(VariantOneFinetuneClassifier, self).__init__()
 
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
         self.classifier = VariantOneClassifier()
 
     def forward(self, input_batch, mask_batch):
-        embeddings = self.code_bert(input_ids=input_batch, attention_mask=mask_batch)
+        embeddings = self.code_bert(
+            input_ids=input_batch, attention_mask=mask_batch)
         embeddings = embeddings.last_hidden_state[:, 0, :]
         out = self.classifier(embeddings)
         return out
@@ -504,12 +516,15 @@ class VariantFiveClassifier(nn.Module):
 class VariantFiveFineTuneClassifier(nn.Module):
     def __init__(self):
         super(VariantFiveFineTuneClassifier, self).__init__()
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
         self.classifier = VariantFiveClassifier()
 
     def forward(self, added_input, added_mask, removed_input, removed_mask):
-        added_embeddings = self.code_bert(input_ids=added_input, attention_mask=added_mask).last_hidden_state[:, 0, :]
-        removed_embeddings = self.code_bert(input_ids=removed_input, attention_mask=removed_mask).last_hidden_state[:, 0, :]
+        added_embeddings = self.code_bert(
+            input_ids=added_input, attention_mask=added_mask).last_hidden_state[:, 0, :]
+        removed_embeddings = self.code_bert(
+            input_ids=removed_input, attention_mask=removed_mask).last_hidden_state[:, 0, :]
         out = self.classifier(added_embeddings, removed_embeddings)
         return out
 
@@ -526,7 +541,9 @@ class VariantEightClassifier(nn.Module):
     def __init__(self):
         super(VariantEightClassifier, self).__init__()
         self.input_size = 768
+        # change
         self.hidden_size = 128
+        self.hidden_size = 32
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.lstm = nn.LSTM(input_size=self.input_size,
                             hidden_size=self.hidden_size,
@@ -611,9 +628,9 @@ class VariantEightGruClassifier(nn.Module):
         self.hidden_size = 128
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.gru = nn.GRU(input_size=self.input_size,
-                            hidden_size=self.hidden_size,
-                            batch_first=True,
-                            bidirectional=False)
+                          hidden_size=self.hidden_size,
+                          batch_first=True,
+                          bidirectional=False)
         self.linear = nn.Linear(2 * self.hidden_size, self.hidden_size)
 
         self.relu = nn.ReLU()
@@ -649,20 +666,29 @@ class VariantSixFineTuneClassifier(nn.Module):
     def __init__(self):
         super(VariantSixFineTuneClassifier, self).__init__()
         self.HIDDEN_DIM = 768
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
         self.classifier = VariantSixClassifier()
 
     def forward(self, added_input_list_batch, added_mask_list_batch, removed_input_list_batch, removed_mask_list_batch):
         d1, d2, d3 = added_input_list_batch.shape
-        added_input_list_batch = torch.reshape(added_input_list_batch, (d1 * d2, d3))
-        added_mask_list_batch = torch.reshape(added_mask_list_batch, (d1 * d2, d3))
-        added_embeddings = self.code_bert(input_ids=added_input_list_batch, attention_mask=added_mask_list_batch).last_hidden_state[:, 0, :]
-        added_embeddings = torch.reshape(added_embeddings, (d1, d2, self.HIDDEN_DIM))
+        added_input_list_batch = torch.reshape(
+            added_input_list_batch, (d1 * d2, d3))
+        added_mask_list_batch = torch.reshape(
+            added_mask_list_batch, (d1 * d2, d3))
+        added_embeddings = self.code_bert(
+            input_ids=added_input_list_batch, attention_mask=added_mask_list_batch).last_hidden_state[:, 0, :]
+        added_embeddings = torch.reshape(
+            added_embeddings, (d1, d2, self.HIDDEN_DIM))
 
-        removed_input_list_batch = torch.reshape(removed_input_list_batch, (d1 * d2, d3))
-        removed_mask_list_batch = torch.reshape(removed_mask_list_batch, (d1 * d2, d3))
-        removed_embeddings = self.code_bert(input_ids=removed_input_list_batch, attention_mask=removed_mask_list_batch).last_hidden_state[:, 0, :]
-        removed_embeddings = torch.reshape(removed_embeddings, (d1, d2, self.HIDDEN_DIM))
+        removed_input_list_batch = torch.reshape(
+            removed_input_list_batch, (d1 * d2, d3))
+        removed_mask_list_batch = torch.reshape(
+            removed_mask_list_batch, (d1 * d2, d3))
+        removed_embeddings = self.code_bert(
+            input_ids=removed_input_list_batch, attention_mask=removed_mask_list_batch).last_hidden_state[:, 0, :]
+        removed_embeddings = torch.reshape(
+            removed_embeddings, (d1, d2, self.HIDDEN_DIM))
 
         out = self.classifier(added_embeddings, removed_embeddings)
 
@@ -689,6 +715,7 @@ class EncoderRNN(nn.Module):
                             h_dim,
                             batch_first=batch_first,
                             bidirectional=True)
+
     def init_hidden(self, b_size):
         h0 = Variable(torch.zeros(1*2, b_size, self.h_dim))
         c0 = Variable(torch.zeros(1*2, b_size, self.h_dim))
@@ -714,7 +741,8 @@ class Attn(nn.Module):
 
     def forward(self, encoder_outputs):
         b_size = encoder_outputs.size(0)
-        attn_ene = self.main(encoder_outputs.reshape(-1, self.h_dim)) # (b, s, h) -> (b * s, 1)
+        # (b, s, h) -> (b * s, 1)
+        attn_ene = self.main(encoder_outputs.reshape(-1, self.h_dim))
         return F.softmax(attn_ene.view(b_size, -1),
                          dim=1).unsqueeze(2)  # (b*s, 1) -> (b, s, 1)
 
@@ -728,14 +756,14 @@ class AttnClassifier(nn.Module):
         self.output = nn.Linear(h_dim, c_num)
 
     def forward(self, a_output, b_output):
-        a_attn = self.attn1(a_output)  #(b, s, 1)
-        b_attn = self.attn2(b_output) #()  #(b, s, 1)
+        a_attn = self.attn1(a_output)  # (b, s, 1)
+        b_attn = self.attn2(b_output)  # ()  #(b, s, 1)
         a_feats = (a_output * a_attn).sum(dim=1)  # (b, s, h) -> (b, h)
         b_feats = (b_output * b_attn).sum(dim=1)
         feats = torch.cat((a_feats, b_feats), 1)
         o_feats = self.linear(feats)
         out = self.output(o_feats)
-        return F.log_softmax(out, -1) , a_attn, b_attn
+        return F.log_softmax(out, -1), a_attn, b_attn
 
 
 class VariantEightAttentionClassifier(nn.Module):
@@ -764,6 +792,7 @@ class VariantEightAttentionClassifier(nn.Module):
         out = self.output(o_feats)
         return out
 
+
 class VariantEightFineTuneOnlyClassifier(nn.Module):
     def __init__(self):
         super(VariantEightFineTuneOnlyClassifier, self).__init__()
@@ -772,7 +801,8 @@ class VariantEightFineTuneOnlyClassifier(nn.Module):
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.NUMBER_OF_LABELS = 2
 
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
 
         self.linear = nn.Linear(self.HIDDEN_DIM, self.DENSE_DIM)
         self.relu = nn.ReLU()
@@ -780,7 +810,8 @@ class VariantEightFineTuneOnlyClassifier(nn.Module):
         self.out_proj = nn.Linear(self.DENSE_DIM, self.NUMBER_OF_LABELS)
 
     def forward(self, input_batch, mask_batch):
-        embeddings = self.code_bert(input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
+        embeddings = self.code_bert(
+            input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
 
         x = embeddings
         x = self.drop_out(x)
@@ -800,7 +831,8 @@ class VariantSeventFineTuneOnlyClassifier(nn.Module):
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.NUMBER_OF_LABELS = 2
 
-        self.code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+        self.code_bert = RobertaModel.from_pretrained(
+            "microsoft/codebert-base", num_labels=2)
 
         self.linear = nn.Linear(self.HIDDEN_DIM, self.DENSE_DIM)
         self.relu = nn.ReLU()
@@ -808,7 +840,8 @@ class VariantSeventFineTuneOnlyClassifier(nn.Module):
         self.out_proj = nn.Linear(self.DENSE_DIM, self.NUMBER_OF_LABELS)
 
     def forward(self, input_batch, mask_batch, need_final_feature=False):
-        embeddings = self.code_bert(input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
+        embeddings = self.code_bert(
+            input_ids=input_batch, attention_mask=mask_batch).last_hidden_state[:, 0, :]
 
         x = embeddings
         x = self.drop_out(x)
@@ -851,7 +884,8 @@ class EnsembleModel(nn.Module):
         if not self.ablation_study:
             self.l5 = nn.Linear(7 * self.FEATURE_DIM, self.FEATURE_DIM)
         else:
-            self.l5 = nn.Linear((7 - len(variant_to_drop)) * self.FEATURE_DIM, self.FEATURE_DIM)
+            self.l5 = nn.Linear((7 - len(variant_to_drop))
+                                * self.FEATURE_DIM, self.FEATURE_DIM)
 
         self.variant_to_drop = variant_to_drop
 
@@ -865,18 +899,26 @@ class EnsembleModel(nn.Module):
         feature_7 = self.l2(feature_7)
         feature_5 = self.l3(feature_5)
         feature_8 = self.l4(feature_8)
-        all_features = [feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8]
+        all_features = [feature_1, feature_2, feature_3,
+                        feature_5, feature_6, feature_7, feature_8]
         if self.ablation_study:
             tmp = all_features
             all_features = []
             drop = []
-            drop.append(True) if 1 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 2 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 3 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 5 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 6 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 7 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 8 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 1 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 2 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 3 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 5 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 6 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 7 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 8 in self.variant_to_drop else drop.append(False)
             for i in range(len(drop)):
                 if not drop[i]:
                     all_features.append(tmp[i])
@@ -890,12 +932,12 @@ class EnsembleModel(nn.Module):
         x = self.relu(x)
         x = self.drop_out(x)
         x = self.out_proj(x)
-        
+
         if not need_features:
             return x
         else:
             return x, pca_features
-           
+
 
 class EnsemblePCAModel(nn.Module):
     def __init__(self, feature_dim):
@@ -903,7 +945,7 @@ class EnsemblePCAModel(nn.Module):
         self.FEATURE_DIM = feature_dim
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.NUMBER_OF_LABELS = 2
-        
+
         self.linear = nn.Linear(self.FEATURE_DIM, self.FEATURE_DIM)
         self.relu = nn.ReLU()
         self.drop_out = nn.Dropout(self.HIDDEN_DIM_DROPOUT_PROB)
@@ -914,12 +956,11 @@ class EnsemblePCAModel(nn.Module):
         x = self.relu(x)
         x = self.drop_out(x)
         x = self.out_proj(x)
-        
+
         if not need_features:
             return x
         else:
             return x
-
 
 
 class EnsembleModelHunkLevelFCN(nn.Module):
@@ -949,7 +990,8 @@ class EnsembleModelHunkLevelFCN(nn.Module):
         if not self.ablation_study:
             self.l5 = nn.Linear(7 * self.FEATURE_DIM, self.FEATURE_DIM)
         else:
-            self.l5 = nn.Linear((7 - len(variant_to_drop)) * self.FEATURE_DIM, self.FEATURE_DIM)
+            self.l5 = nn.Linear((7 - len(variant_to_drop))
+                                * self.FEATURE_DIM, self.FEATURE_DIM)
 
         self.variant_to_drop = variant_to_drop
 
@@ -963,18 +1005,26 @@ class EnsembleModelHunkLevelFCN(nn.Module):
         # feature_7 = self.l2(feature_7)
         feature_5 = self.l3(feature_5)
         feature_8 = self.l4(feature_8)
-        all_features = [feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8]
+        all_features = [feature_1, feature_2, feature_3,
+                        feature_5, feature_6, feature_7, feature_8]
         if self.ablation_study:
             tmp = all_features
             all_features = []
             drop = []
-            drop.append(True) if 1 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 2 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 3 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 5 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 6 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 7 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 8 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 1 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 2 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 3 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 5 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 6 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 7 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 8 in self.variant_to_drop else drop.append(False)
             for i in range(len(drop)):
                 if not drop[i]:
                     all_features.append(tmp[i])
@@ -988,7 +1038,7 @@ class EnsembleModelHunkLevelFCN(nn.Module):
         x = self.relu(x)
         x = self.drop_out(x)
         x = self.out_proj(x)
-        
+
         if not need_features:
             return x
         else:
@@ -1022,8 +1072,8 @@ class EnsembleModelFileLevelCNN(nn.Module):
         if not self.ablation_study:
             self.l5 = nn.Linear(7 * self.FEATURE_DIM, self.FEATURE_DIM)
         else:
-            self.l5 = nn.Linear((7 - len(variant_to_drop)) * self.FEATURE_DIM, self.FEATURE_DIM)
-
+            self.l5 = nn.Linear((7 - len(variant_to_drop))
+                                * self.FEATURE_DIM, self.FEATURE_DIM)
 
         # giang, need 2 more linear layer, each for variant 2 and variant 6.
         # self.l5 is already defined
@@ -1045,18 +1095,26 @@ class EnsembleModelFileLevelCNN(nn.Module):
         feature_8 = self.l4(feature_8)
         feature_2 = self.l6(feature_2)
         feature_6 = self.l7(feature_6)
-        all_features = [feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8]
+        all_features = [feature_1, feature_2, feature_3,
+                        feature_5, feature_6, feature_7, feature_8]
         if self.ablation_study:
             tmp = all_features
             all_features = []
             drop = []
-            drop.append(True) if 1 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 2 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 3 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 5 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 6 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 7 in self.variant_to_drop else drop.append(False)
-            drop.append(True) if 8 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 1 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 2 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 3 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 5 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 6 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 7 in self.variant_to_drop else drop.append(False)
+            drop.append(
+                True) if 8 in self.variant_to_drop else drop.append(False)
             for i in range(len(drop)):
                 if not drop[i]:
                     all_features.append(tmp[i])

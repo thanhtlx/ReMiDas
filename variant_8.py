@@ -280,7 +280,7 @@ def do_train():
         # model = nn.DataParallel(model)
 
     model.to(device)
-
+    print(model)
     train(model=model,
           learning_rate=LEARNING_RATE,
           number_of_epochs=NUMBER_OF_EPOCHS,
