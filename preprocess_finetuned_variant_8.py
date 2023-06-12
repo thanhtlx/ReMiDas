@@ -22,7 +22,7 @@ dataset_name = 'big_vf.csv'
 dataset_name = 'test.csv'
 # change 32
 CODE_LINE_LENGTH = 64
-CODE_LINE_LENGTH = 32
+CODE_LINE_LENGTH = 16
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")

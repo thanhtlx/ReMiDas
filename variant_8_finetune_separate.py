@@ -53,7 +53,7 @@ torch.backends.cudnn.benchmark = True
 false_cases = []
 # change
 CODE_LENGTH = 64
-CODE_LENGTH = 32
+CODE_LENGTH = 16
 HIDDEN_DIM = 768
 
 NUMBER_OF_LABELS = 2
