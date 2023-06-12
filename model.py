@@ -543,14 +543,12 @@ class VariantEightClassifier(nn.Module):
         self.input_size = 768
         # change
         self.hidden_size = 128
-        self.hidden_size = 32
+        self.hidden_size = 16
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.lstm = nn.LSTM(input_size=self.input_size,
                             hidden_size=self.hidden_size,
                             batch_first=True,
-                            # change
-                            # bidirectional=True)
-                            bidirectional=False)
+                            bidirectional=True)
         self.linear = nn.Linear(4 * self.hidden_size, self.hidden_size)
 
         self.relu = nn.ReLU()
