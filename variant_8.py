@@ -191,9 +191,9 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
         total_loss = 0
         current_batch = 0
         for id_batch, url_batch, before_batch, after_batch, label_batch in training_generator:
-            for name, size in sorted(((name, sys.getsizeof(value)) for name, value in list(
-                    locals().items())), key=lambda x: -x[1]):
-                print("{:>30}: {:>8}".format(name, sizeof_fmt(size)))
+            # for name, size in sorted(((name, sys.getsizeof(value)) for name, value in list(
+            #         locals().items())), key=lambda x: -x[1]):
+            #     print("{:>30}: {:>8}".format(name, sizeof_fmt(size)))
             before_batch, after_batch, label_batch \
                 = before_batch.to(device), after_batch.to(device), label_batch.to(device)
 
@@ -206,6 +206,8 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             optimizer.step()
             lr_scheduler.step()
             total_loss += loss.detach().item()
+            del before_batch, after_batch, outs
+            torch.cuda.empty_cache()
 
             current_batch += 1
             if current_batch % 50 == 0:
