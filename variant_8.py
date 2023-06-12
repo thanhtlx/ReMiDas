@@ -158,7 +158,10 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
     return avg_val_los
 
 
-def train(model, learning_rate, number_of_epochs, training_generator, val_generator, test_java_generator, test_python_generator):
+def train(learning_rate, number_of_epochs, training_generator, val_generator, test_java_generator, test_python_generator):
+    model = VariantEightClassifier()
+    model.to(device)
+    print(model)
     loss_function = nn.NLLLoss()
     optimizer = AdamW(model.parameters(), lr=learning_rate)
     num_training_steps = NUMBER_OF_EPOCHS * len(training_generator)
@@ -272,22 +275,18 @@ def do_train():
         test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
     # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS, collate_fn=custom_collate)
 
-    model = VariantEightClassifier()
-
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
         # model = nn.DataParallel(model)
 
-    model.to(device)
-    print(model)
-    train(model=model,
-          learning_rate=LEARNING_RATE,
-          number_of_epochs=NUMBER_OF_EPOCHS,
-          training_generator=training_generator,
-          val_generator=val_generator,
-          test_java_generator=test_java_generator,
-          test_python_generator=None)
+    train(
+        learning_rate=LEARNING_RATE,
+        number_of_epochs=NUMBER_OF_EPOCHS,
+        training_generator=training_generator,
+        val_generator=val_generator,
+        test_java_generator=test_java_generator,
+        test_python_generator=None)
 
 
 if __name__ == '__main__':
