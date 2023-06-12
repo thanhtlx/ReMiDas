@@ -199,6 +199,7 @@ def train(learning_rate, number_of_epochs, training_generator, val_generator, te
             print(torch.cuda.mem_get_info())
             print(torch.cuda.memory_summary())
             print(before_batch, after_batch)
+            print(before_batch.shape,after_batch.shape)
             outs = model(before_batch, after_batch)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
