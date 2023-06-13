@@ -183,6 +183,7 @@ def get_data():
         file_path = os.path.join(
             directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
+            print(file_path)
             continue
 
         for i, diff in enumerate(diff_list):
