@@ -202,8 +202,8 @@ def get_data():
                 added_code_list.append(added_code)
                 added_url_list.append(url)
             if url == "ffmpeg___ffmpeg/commit/b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
-                print(added_code)
-                print(removed_code)
+                print("added code", added_code)
+                print("removed code", removed_code)
                 print(diff.splitlines())
                 for line in diff.splitlines()[:150]:
                     mark = '+'
