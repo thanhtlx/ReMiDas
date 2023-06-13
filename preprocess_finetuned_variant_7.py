@@ -207,6 +207,7 @@ def get_data():
                 print(diff.splitlines())
                 for line in diff.splitlines()[:150]:
                     mark = '+'
+                print(line.startswith(mark), mark, line)
                 if line.startswith(mark):
                     line = line[1:].strip()
                     if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
