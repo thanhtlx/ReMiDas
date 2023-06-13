@@ -48,7 +48,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/', '#')):
                 continue
             code = code + line + '\n'
 
@@ -173,10 +173,6 @@ def get_data():
             url_to_hunk[url] = []
 
         url_to_hunk[url].extend(get_hunk_from_diff(diff))
-        if commit_id == "b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
-            print(item)
-            print(url)
-            print(url_to_hunk[url])
 
     removed_code_list = []
     added_code_list = []
@@ -201,18 +197,6 @@ def get_data():
             if added_code.strip() != '':
                 added_code_list.append(added_code)
                 added_url_list.append(url)
-            if url == "ffmpeg___ffmpeg/commit/b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
-                print("added code", added_code)
-                print("removed code", removed_code)
-                print(diff.splitlines())
-                for line in diff.splitlines()[:150]:
-                    mark = '+'
-                    print(line.startswith(mark), mark, line)
-                    if line.startswith(mark):
-                        line = line[1:].strip()
-                        if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
-                            continue
-                        print('take', line)
 
         if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
             removed_embeddings = get_hunk_embeddings(
