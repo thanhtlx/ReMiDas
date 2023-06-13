@@ -164,8 +164,7 @@ def get_data():
 
     for item in items:
         commit_id = item[0]
-        if commit_id == "b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
-            print(item)
+
         repo = item[1]
         url = repo + '/commit/' + commit_id
         diff = item[3]
@@ -174,6 +173,10 @@ def get_data():
             url_to_hunk[url] = []
 
         url_to_hunk[url].extend(get_hunk_from_diff(diff))
+        if commit_id == "b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
+            print(item)
+            print(url)
+            print(url_to_hunk[url])
 
     removed_code_list = []
     added_code_list = []
@@ -182,8 +185,9 @@ def get_data():
     for url, diff_list in tqdm.tqdm(url_to_hunk.items()):
         file_path = os.path.join(
             directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        # co roi thi thoi ?
         if os.path.isfile(file_path):
-            print(file_path)
+            # print(file_path)
             continue
 
         for i, diff in enumerate(diff_list):
