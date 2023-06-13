@@ -201,11 +201,11 @@ def get_data():
             if added_code.strip() != '':
                 added_code_list.append(added_code)
                 added_url_list.append(url)
-        if url == "ffmpeg___ffmpeg/commit/b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
-            print(added_code_list[-1])
-            print(added_url_list[-1])
-            print(removed_code_list[-1])
-            print(removed_url_list[-1])
+            if url == "ffmpeg___ffmpeg/commit/b12d92efd6c0d48665383a9baecc13e7ebbd8a22":
+                print(added_code)
+                print(removed_code)
+                print(diff.splitlines())
+
         if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
             removed_embeddings = get_hunk_embeddings(
                 removed_code_list, tokenizer, code_bert)
