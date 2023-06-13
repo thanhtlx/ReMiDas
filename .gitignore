@@ -14,3 +14,7 @@
 /features
 /img
 /model
+*.ipynb
+/env/
+env/
+env
