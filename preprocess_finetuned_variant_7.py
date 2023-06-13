@@ -42,7 +42,7 @@ def get_code_version(diff, added_version):
     lines = diff.splitlines()
     # change
     # for line in lines
-    for line in lines[:150]:
+    for line in lines:
         mark = '+'
         if not added_version:
             mark = '-'
