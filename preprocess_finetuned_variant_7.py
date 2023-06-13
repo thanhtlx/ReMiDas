@@ -205,6 +205,15 @@ def get_data():
                 print(added_code)
                 print(removed_code)
                 print(diff.splitlines())
+                for line in diff.splitlines()[:150]:
+                    mark = '+'
+                if not added_version:
+                    mark = '-'
+                if line.startswith(mark):
+                    line = line[1:].strip()
+                    if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+                        continue
+                    print('take', line)
 
         if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
             removed_embeddings = get_hunk_embeddings(
