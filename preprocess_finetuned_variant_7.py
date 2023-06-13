@@ -42,7 +42,7 @@ def get_code_version(diff, added_version):
     lines = diff.splitlines()
     # change
     # for line in lines
-    for line in lines:
+    for line in lines[:150]:
         mark = '+'
         if not added_version:
             mark = '-'
@@ -207,12 +207,12 @@ def get_data():
                 print(diff.splitlines())
                 for line in diff.splitlines()[:150]:
                     mark = '+'
-                print(line.startswith(mark), mark, line)
-                if line.startswith(mark):
-                    line = line[1:].strip()
-                    if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
-                        continue
-                    print('take', line)
+                    print(line.startswith(mark), mark, line)
+                    if line.startswith(mark):
+                        line = line[1:].strip()
+                        if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+                            continue
+                        print('take', line)
 
         if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
             removed_embeddings = get_hunk_embeddings(
