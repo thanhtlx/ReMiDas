@@ -207,8 +207,6 @@ def get_data():
                 print(diff.splitlines())
                 for line in diff.splitlines()[:150]:
                     mark = '+'
-                if not added_version:
-                    mark = '-'
                 if line.startswith(mark):
                     line = line[1:].strip()
                     if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
