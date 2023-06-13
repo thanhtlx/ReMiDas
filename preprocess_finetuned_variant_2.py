@@ -13,8 +13,8 @@ directory = os.path.dirname(os.path.abspath(__file__))
 
 dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
-dataset_name ='big_vf.csv'
-dataset_name ='test.csv'
+dataset_name = 'big_vf.csv'
+dataset_name = 'test.csv'
 EMBEDDING_DIRECTORY = 'finetuned_embeddings/variant_2'
 FINE_TUNED_MODEL_PATH = 'model/patch_variant_2_finetuned_model.sav'
 
@@ -40,7 +40,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/', '#')):
                 continue
             code = code + line + '\n'
 
@@ -48,7 +48,8 @@ def get_code_version(diff, added_version):
 
 
 def get_input_and_mask(tokenizer, code_list):
-    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH,
+                       truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -60,7 +61,8 @@ def get_file_embeddings(code_list, tokenizer, code_bert):
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        embeddings = code_bert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        embeddings = code_bert(
+            input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
     embeddings = embeddings.tolist()
     return embeddings
 
@@ -83,7 +85,7 @@ def write_embeddings_to_files(code_list, url_list, tokenizer, code_bert):
     for url, data in url_to_data.items():
         file_path = os.path.join(directory, EMBEDDING_DIRECTORY)
         pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
-        file_path =  file_path + '/' + url.replace('/', '_') + '.txt'
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
         json.dump(data, open(file_path, 'w'))
 
 
@@ -96,7 +98,7 @@ def get_data():
         model = nn.DataParallel(model)
 
     model.load_state_dict(torch.load(FINE_TUNED_MODEL_PATH))
-    #change
+    # change
     code_bert = model.code_bert
 
     if torch.cuda.device_count() > 1:
@@ -109,7 +111,8 @@ def get_data():
 
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -136,7 +139,8 @@ def get_data():
             url_list.append(url)
 
         if len(url_list) >= 200:
-            write_embeddings_to_files(code_list, url_list, tokenizer, code_bert)
+            write_embeddings_to_files(
+                code_list, url_list, tokenizer, code_bert)
             code_list = []
             url_list = []
 
