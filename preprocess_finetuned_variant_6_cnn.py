@@ -29,7 +29,8 @@ torch.backends.cudnn.benchmark = True
 
 
 def get_input_and_mask(tokenizer, code_list):
-    inputs = tokenizer(code_list, padding='max_length', max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code_list, padding='max_length',
+                       max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -43,7 +44,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/', '#')):
                 continue
             code = code + line + '\n'
 
@@ -59,7 +60,8 @@ def get_file_embeddings(code_list, tokenizer, code_bert):
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        embeddings = code_bert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        embeddings = code_bert(
+            input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
     embeddings = embeddings.tolist()
     return embeddings
 
@@ -92,7 +94,8 @@ def write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_
         data = {'before': before_data, 'after': after_data}
         url_to_data[url] = data
     for url, data in url_to_data.items():
-        file_path = os.path.join(directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         json.dump(data, open(file_path, 'w'))
 
 
@@ -117,7 +120,8 @@ def get_data():
 
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -138,7 +142,8 @@ def get_data():
     removed_url_list = []
     added_url_list = []
     for url, diff_list in tqdm.tqdm(url_to_diff.items()):
-        file_path = os.path.join(directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
             continue
 
@@ -154,10 +159,13 @@ def get_data():
                 added_url_list.append(url)
 
         if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
-            removed_embeddings = get_file_embeddings(removed_code_list, tokenizer, code_bert)
-            added_embeddings = get_file_embeddings(added_code_list, tokenizer, code_bert)
+            removed_embeddings = get_file_embeddings(
+                removed_code_list, tokenizer, code_bert)
+            added_embeddings = get_file_embeddings(
+                added_code_list, tokenizer, code_bert)
 
-            write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_list, added_url_list)
+            write_embeddings_to_files(
+                removed_embeddings, added_embeddings, removed_url_list, added_url_list)
 
             removed_code_list = []
             added_code_list = []
@@ -165,9 +173,12 @@ def get_data():
             added_url_list = []
 
     if len(removed_code_list) > 0 or len(added_code_list) > 0:
-        removed_embeddings = get_file_embeddings(removed_code_list, tokenizer, code_bert)
-        added_embeddings = get_file_embeddings(added_code_list, tokenizer, code_bert)
-        write_embeddings_to_files(removed_embeddings, added_embeddings, removed_url_list, added_url_list)
+        removed_embeddings = get_file_embeddings(
+            removed_code_list, tokenizer, code_bert)
+        added_embeddings = get_file_embeddings(
+            added_code_list, tokenizer, code_bert)
+        write_embeddings_to_files(
+            removed_embeddings, added_embeddings, removed_url_list, added_url_list)
 
 
 if __name__ == '__main__':

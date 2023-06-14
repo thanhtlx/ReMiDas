@@ -35,7 +35,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/', '#')):
                 continue
             code = code + line + '\n'
 
@@ -43,7 +43,8 @@ def get_code_version(diff, added_version):
 
 
 def get_input_and_mask(tokenizer, code_list):
-    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH,
+                       truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -56,7 +57,8 @@ def get_commit_embeddings(code_list, tokenizer, code_bert):
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        embeddings = code_bert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        embeddings = code_bert(
+            input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
     embeddings = embeddings.tolist()
     return embeddings
 
@@ -74,13 +76,15 @@ def write_embeddings_to_files(code_list, url_list, tokenizer, code_bert):
         data['embedding'] = embedding
         url_to_data[url] = data
     for url, data in url_to_data.items():
-        file_path = os.path.join(directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        file_path = os.path.join(
+            directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         json.dump(data, open(file_path, 'w'))
 
 
 def get_data():
     tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
-    code_bert = RobertaModel.from_pretrained("microsoft/codebert-base", num_labels=2)
+    code_bert = RobertaModel.from_pretrained(
+        "microsoft/codebert-base", num_labels=2)
     if torch.cuda.device_count() > 1:
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
@@ -90,7 +94,8 @@ def get_data():
     code_bert.eval()
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -118,7 +123,8 @@ def get_data():
         url_list.append(url)
 
         if len(url_list) >= 50:
-            write_embeddings_to_files(code_list, url_list, tokenizer, code_bert)
+            write_embeddings_to_files(
+                code_list, url_list, tokenizer, code_bert)
             code_list = []
             url_list = []
 

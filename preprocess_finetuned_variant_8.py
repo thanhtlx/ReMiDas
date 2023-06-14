@@ -43,7 +43,7 @@ def get_input_and_mask(tokenizer, code_list):
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    #change
+    # change
     # for line in lines:
     # limit line: fix out of memory incase very large line >150 line
     for line in lines[:150]:
@@ -52,7 +52,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*', '*/', '#')) or line.strip() == '':
+            if line.startswith(('//', '/**', '/*', '*/', '#')) or line.strip() == '':
                 continue
             code = code + line + '\n'
 
