@@ -201,9 +201,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, test_java_
 
     write_prob_to_file(JAVA_RESULT_PATH, urls, probs)
 
-
-    write_prob_to_file(PYTHON_RESULT_PATH, urls, probs)
-
     torch.save(model.state_dict(), FINAL_MODEL_PATH)
 
     return model
@@ -222,9 +219,6 @@ def do_train(args):
     if JAVA_RESULT_PATH is None or JAVA_RESULT_PATH == '':
         raise Exception("Java result path must not be None or empty")
 
-    # PYTHON_RESULT_PATH = args.python_result_path
-    # if PYTHON_RESULT_PATH is None or PYTHON_RESULT_PATH == '':
-    #     raise Exception("Java result path must not be None or empty")
 
     variant_to_drop = []
     if args.variant_to_drop is not None:
@@ -261,24 +255,12 @@ def do_train(args):
         'features/feature_variant_8_test_java.txt'
     ]
 
-    # test_python_feature_path = [
-    #     'features/feature_variant_1_test_python.txt',
-    #     'features/feature_variant_2_test_python.txt',
-    #     'features/feature_variant_3_test_python.txt',
-    #     'features/feature_variant_5_test_python.txt',
-    #     'features/feature_variant_6_test_python.txt',
-    #     'features/feature_variant_7_test_python.txt',
-    #     'features/feature_variant_8_test_python.txt'
-    # ]
-
     print("Reading data...")
     url_to_features = {}
     print("Reading train data")
     url_to_features.update(read_feature_list(train_feature_path))
     print("Reading test java data")
     url_to_features.update(read_feature_list(test_java_feature_path))
-    # print("Reading test python data")
-    # url_to_features.update(read_feature_list(test_python_feature_path))
 
     print("Finish reading")
     url_data, label_data = utils.get_data(dataset_name)
@@ -317,12 +299,6 @@ def do_train(args):
         id_to_feature[index] = feature_data['test_java'][i]
         index += 1
 
-    # for i, url in enumerate(url_data['test_python']):
-    #     test_python_ids.append(index)
-    #     id_to_url[index] = url
-    #     id_to_label[index] = label_data['test_python'][i]
-    #     id_to_feature[index] = feature_data['test_python'][i]
-    #     index += 1
 
     training_set = EnsembleDataset(val_ids, id_to_label, id_to_url, id_to_feature)
     test_java_set = EnsembleDataset(test_java_ids, id_to_label, id_to_url, id_to_feature)
@@ -348,98 +324,6 @@ def do_train(args):
           test_java_generator=test_java_generator,
           test_python_generator=None)
 
-
-def infer_dataset(model_path, partition, ablation_study, variant_to_drop, prob_path):
-    # val_feature_path = [
-    #     'features/feature_variant_1_val.txt',
-    #     'features/feature_variant_2_val.txt',
-    #     'features/feature_variant_3_val.txt',
-    #     'features/feature_variant_5_val.txt',
-    #     'features/feature_variant_6_val.txt',
-    #     'features/feature_variant_7_val.txt',
-    #     'features/feature_variant_8_val.txt'
-    # ]
-
-
-    test_java_feature_path = [
-        'features/feature_variant_1_test_java.txt',
-        'features/feature_variant_2_test_java.txt',
-        'features/feature_variant_3_test_java.txt',
-        'features/feature_variant_5_test_java.txt',
-        'features/feature_variant_6_test_java.txt',
-        'features/feature_variant_7_test_java.txt',
-        'features/feature_variant_8_test_java.txt'
-    ]
-
-    test_python_feature_path = [
-        'features/feature_variant_1_test_python.txt',
-        'features/feature_variant_2_test_python.txt',
-        'features/feature_variant_3_test_python.txt',
-        'features/feature_variant_5_test_python.txt',
-        'features/feature_variant_6_test_python.txt',
-        'features/feature_variant_7_test_python.txt',
-        'features/feature_variant_8_test_python.txt'
-    ]
-
-    # model = EnsembleModelHunkLevelFCN(False, [])
-
-    model = EnsembleModel(ablation_study, variant_to_drop)
-
-    if torch.cuda.device_count() > 1:
-        print("Let's use", torch.cuda.device_count(), "GPUs!")
-        # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-        model = nn.DataParallel(model)
-
-    model.load_state_dict(torch.load('model/patch_ensemble_model.sav'))
-    model.to(device)
-
-    print("Reading data")
-    url_to_features = read_feature_list(test_python_feature_path)
-
-
-    print("Finish reading")
-    url_data, label_data = utils.get_data(dataset_name)
-
-    feature_data = {}
-    feature_data[partition] = []
-
-    for url in url_data[partition]:
-        feature_data[partition].append(url_to_features[url])
-
-    val_ids = []
-    index = 0
-    id_to_url = {}
-    id_to_label = {}
-    id_to_feature = {}
-
-    for i, url in enumerate(url_data[partition]):
-        val_ids.append(index)
-        id_to_url[index] = url
-        id_to_label[index] = label_data[partition][i]
-        id_to_feature[index] = feature_data[partition][i]
-        index += 1
-
-    val_set = EnsembleDataset(val_ids, id_to_label, id_to_url, id_to_feature)
-
-    val_generator = DataLoader(val_set, **TEST_PARAMS)
-    
-
-    print("Result on dataset...")
-    precision, recall, f1, auc, urls, probs, features = predict_test_data(model=model,
-                                                    testing_generator=val_generator,
-                                                    device=device, need_prob=True)
-
-
-
-    write_prob_to_file(prob_path, urls, probs)
-    # write_feature_to_file(feature_path, urls, features)
-    print("Precision: {}".format(precision))
-    print("Recall: {}".format(recall))
-    print("F1: {}".format(f1))
-    print("AUC: {}".format(auc))
-    print("-" * 32)
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ensemble Classifier')
     parser.add_argument('--ablation_study',
@@ -462,5 +346,3 @@ if __name__ == '__main__':
     #                     help='path to save prediction for Python projects')
     args = parser.parse_args()
     do_train(args)
-
-    # infer_dataset('test_python', 'features/feature_ensemble_test_python.txt')
