@@ -447,7 +447,7 @@ def infer_variant_8(partition, result_file_path, need_feature_only=False):
 
     model.to(device)
 
-    model.load_state_dict(torch.load(VARIANT_EIGHT_MODEL_PATH, map_location={'cuda:0': 'cuda:1'}))
+    model.load_state_dict(torch.load(VARIANT_EIGHT_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
     dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
@@ -482,7 +482,7 @@ def infer_variant_8_lstm(partition, result_file_path, need_feature_only=False):
 
     model.to(device)
 
-    model.load_state_dict(torch.load(VARIANT_EIGHT_LSTM_MODEL_PATH, map_location={'cuda:0': 'cuda:1'}))
+    model.load_state_dict(torch.load(VARIANT_EIGHT_LSTM_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
     dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
@@ -517,7 +517,7 @@ def infer_variant_8_gru(partition, result_file_path, need_feature_only=False):
 
     model.to(device)
 
-    model.load_state_dict(torch.load(VARIANT_EIGHT_GRU_MODEL_PATH, map_location={'cuda:0': 'cuda:1'}))
+    model.load_state_dict(torch.load(VARIANT_EIGHT_GRU_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
     dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
