@@ -175,6 +175,7 @@ def get_data():
             code = removed_code + tokenizer.sep_token + added_code
             code_list.append(code)
             url_list.append(url)
+            print(code_list)
 
         if len(url_list) >= 3:
             write_embeddings_to_files(
