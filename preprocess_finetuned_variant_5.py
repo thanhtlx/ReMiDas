@@ -144,7 +144,7 @@ def get_data():
 
         url_list.append(url)
 
-        if len(url_list) >= 100:
+        if len(url_list) >= 50:
             write_embeddings_to_files(
                 removed_code_list, added_code_list, url_list, tokenizer, code_bert)
             removed_code_list = []

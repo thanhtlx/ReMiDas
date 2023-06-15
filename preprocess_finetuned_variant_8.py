@@ -208,7 +208,7 @@ def get_data():
         removed_code_list.extend(new_removed_code_list)
         added_code_list.extend(new_added_code_list)
         # doan nay giup cho giam memory thoi
-        if len(removed_code_list) >= 500 or len(added_code_list) >= 500:
+        if len(removed_code_list) >= 200 or len(added_code_list) >= 200:
             removed_embeddings = get_line_embeddings(
                 removed_code_list, tokenizer, code_bert)
             added_embeddings = get_line_embeddings(
