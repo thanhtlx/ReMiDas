@@ -41,7 +41,7 @@ def get_code_version(diff, added_version):
     lines = diff.splitlines()
     # change
     # for line in lines:
-    for line in lines[:50]:
+    for line in lines[:20]:
         if len(line.split()) > 50:
             line = " ".join(line.split()[:50])
         mark = '+'
@@ -59,10 +59,11 @@ def get_code_version(diff, added_version):
 def get_hunk_embeddings(code_list, tokenizer, code_bert):
     # process all lines in one
     input_ids, attention_mask = get_input_and_mask(tokenizer, code_list)
-
+    print(input_ids.shape)
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
+        
         embeddings = code_bert(
             input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
         input_ids.to('cpu')
@@ -73,6 +74,7 @@ def get_hunk_embeddings(code_list, tokenizer, code_bert):
 
 
 def write_embeddings_to_files(code_list, url_list, tokenizer, code_bert):
+    
     hunk_embeddings = get_hunk_embeddings(code_list, tokenizer, code_bert)
     url_to_embeddings = {}
     for index, url in enumerate(url_list):
@@ -168,9 +170,7 @@ def get_data():
         for i, diff in enumerate(diff_list):
             removed_code = get_code_version(diff, False)
             added_code = get_code_version(diff, True)
-
             code = removed_code + tokenizer.sep_token + added_code
-
             code_list.append(code)
             url_list.append(url)
 
