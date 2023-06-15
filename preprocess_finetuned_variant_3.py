@@ -60,7 +60,6 @@ def get_hunk_embeddings(code_list, tokenizer, code_bert):
     # process all lines in one
     
     input_ids, attention_mask = get_input_and_mask(tokenizer, code_list)
-    print(input_ids)
     print(input_ids.shape)
     with torch.no_grad():
         input_ids = input_ids.to(device)
@@ -176,7 +175,7 @@ def get_data():
             code_list.append(code)
             url_list.append(url)
 
-        if len(url_list) >= 5:
+        if len(url_list) >= 3:
             write_embeddings_to_files(
                 code_list, url_list, tokenizer, code_bert)
             code_list = []
