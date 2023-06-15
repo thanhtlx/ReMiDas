@@ -30,6 +30,8 @@ def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
     for line in lines:
+        if len(line.split()) > 50:
+            continue
         mark = '+'
         if not added_version:
             mark = '-'
