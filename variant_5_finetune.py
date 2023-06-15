@@ -19,7 +19,7 @@ import preprocess_variant_5
 
 # dataset_name = 'huawei_sub_dataset.csv'
 dataset_name = 'ase_dataset_sept_19_2021.csv'
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 
 BEST_MODEL_PATH = 'model/patch_variant_5_finetune_best_model.sav'
 FINE_TUNED_MODEL_PATH = 'model/patch_variant_5_finetuned_model.sav'
@@ -39,9 +39,12 @@ VALIDATION_BATCH_SIZE = 64
 TEST_BATCH_SIZE = 64
 EARLY_STOPPING_ROUND = 5
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 
@@ -55,8 +58,10 @@ torch.backends.cudnn.benchmark = True
 
 CODE_LENGTH = 512
 
+
 def get_input_and_mask(tokenizer, code):
-    inputs = tokenizer(code, padding='max_length', max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code, padding='max_length',
+                       max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'][0], inputs.data['attention_mask'][0]
 
@@ -148,7 +153,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
         train_losses = []
         model.eval()
 
@@ -156,7 +162,7 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         val_loss = get_avg_validation_loss(model, val_generator, loss_function)
         print("Average validation loss of this iteration: {}".format(val_loss))
         print("-" * 32)
-        
+
         early_stopping(val_loss, model)
         #
         # print("Result on Java testing dataset...")
@@ -171,7 +177,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         # print("-" * 32)
         #
 
-
         if early_stopping.early_stop:
             print("Early stopping")
             break
@@ -184,6 +189,7 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 model.module.freeze_codebert()
 
     return model
+
 
 def retrieve_patch_data(all_data, all_label, all_url):
     tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
@@ -198,8 +204,10 @@ def retrieve_patch_data(all_data, all_label, all_url):
     id_to_removed_mask = {}
 
     for i in tqdm(range(len(all_data))):
-        added_code = preprocess_variant_5.get_code_version(diff=all_data[i], added_version=True)
-        removed_code = preprocess_variant_5.get_code_version(diff=all_data[i], added_version=False)
+        added_code = preprocess_variant_5.get_code_version(
+            diff=all_data[i], added_version=True)
+        removed_code = preprocess_variant_5.get_code_version(
+            diff=all_data[i], added_version=False)
 
         added_code = tokenizer.sep_token + added_code
         removed_code = tokenizer.sep_token + removed_code
@@ -270,7 +278,8 @@ def get_data():
                 label_test_python.append(label)
                 url_test_python.append(url)
             else:
-                raise Exception("Invalid programming language: {}".format(partition))
+                raise Exception(
+                    "Invalid programming language: {}".format(partition))
         elif partition == 'val':
             patch_val.append(diff)
             label_val.append(label)
@@ -315,24 +324,30 @@ def do_train():
         test_python_ids.append(index)
         index += 1
 
-    all_data = patch_data['train'] + patch_data['val'] + patch_data['test_java'] + patch_data['test_python']
-    all_label = label_data['train'] + label_data['val'] + label_data['test_java'] + label_data['test_python']
-    all_url = url_data['train'] + url_data['val'] + url_data['test_java'] + url_data['test_python']
+    all_data = patch_data['train'] + patch_data['val'] + \
+        patch_data['test_java'] + patch_data['test_python']
+    all_label = label_data['train'] + label_data['val'] + \
+        label_data['test_java'] + label_data['test_python']
+    all_url = url_data['train'] + url_data['val'] + \
+        url_data['test_java'] + url_data['test_python']
 
     print("Preparing commit patch data...")
     id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask, id_to_label, id_to_url \
         = retrieve_patch_data(all_data, all_label, all_url)
     print("Finish preparing commit patch data")
 
-    training_set = VariantFiveFinetuneDataset(train_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
-    val_set = VariantFiveFinetuneDataset(val_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
-    test_java_set = VariantFiveFinetuneDataset(test_java_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
-    #test_python_set = VariantFiveFinetuneDataset(test_python_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
+    training_set = VariantFiveFinetuneDataset(
+        train_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
+    val_set = VariantFiveFinetuneDataset(
+        val_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
+    test_java_set = VariantFiveFinetuneDataset(
+        test_java_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
+    # test_python_set = VariantFiveFinetuneDataset(test_python_ids, id_to_label, id_to_url, id_to_added_input, id_to_added_mask, id_to_removed_input, id_to_removed_mask)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantFiveFineTuneClassifier()
 

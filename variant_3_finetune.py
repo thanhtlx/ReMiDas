@@ -1,3 +1,5 @@
+import gc
+import sys
 import torch
 from torch import nn as nn
 import os
@@ -20,7 +22,7 @@ import preprocess_variant_1
 
 # dataset_name = 'ase_dataset_sept_19_2021.csv'
 dataset_name = 'huawei_sub_dataset.csv'
-dataset_name ='big_vf.csv'
+dataset_name = 'big_vf.csv'
 directory = os.path.dirname(os.path.abspath(__file__))
 
 model_folder_path = os.path.join(directory, 'model')
@@ -39,9 +41,12 @@ TRAIN_BATCH_SIZE = 2
 VALIDATION_BATCH_SIZE = 16
 TEST_BATCH_SIZE = 16
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 0}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 0}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 0}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 0}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 0}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 0}
 
 LEARNING_RATE = 1e-5
 
@@ -54,15 +59,17 @@ CODE_LENGTH = 256
 # change
 CODE_LENGTH = 32
 HIDDEN_DIM = 768
-#no change hidden dim ??
+# no change hidden dim ??
 HIDDEN_DIM = 32
 NUMBER_OF_LABELS = 2
 
 
 tokenizer = RobertaTokenizer.from_pretrained("microsoft/codebert-base")
 empty_code = tokenizer.sep_token + ''
-inputs = tokenizer(empty_code, return_tensors="pt", padding='max_length', truncation=True, max_length=CODE_LENGTH)
+inputs = tokenizer(empty_code, return_tensors="pt",
+                   padding='max_length', truncation=True, max_length=CODE_LENGTH)
 EMPTY_INPUT, EMPTY_MASK = inputs.data['input_ids'][0], inputs.data['attention_mask'][0]
+
 
 def find_max_length(arr):
     max_len = 0
@@ -110,7 +117,8 @@ def predict_test_data(model, testing_generator, device, need_prob=False):
     with torch.no_grad():
         model.eval()
         for ids, url, input_batch, mask_batch, label_batch in tqdm(testing_generator):
-            input_batch, mask_batch, label_batch = input_batch.to(device), mask_batch.to(device), label_batch.to(device)
+            input_batch, mask_batch, label_batch = input_batch.to(
+                device), mask_batch.to(device), label_batch.to(device)
             outs = model(input_batch, mask_batch)
 
             outs = F.softmax(outs, dim=1)
@@ -145,8 +153,6 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
             validation_loss += loss
-
-
 
     avg_val_los = validation_loss / len(validation_generator)
 
@@ -190,7 +196,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, commit {}/{} total loss {}, average loss {}"
                       .format(current_batch, (index + 1) * TRAIN_BATCH_SIZE, len(training_generator), np.sum(train_losses), np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
 
         train_losses = []
         model.eval()
@@ -230,7 +237,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
 def get_data():
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -279,7 +287,8 @@ def get_data():
                 label_test_python.append(label)
                 url_test_python.append(url)
             else:
-                raise Exception("Invalid programming language: {}".format(partition))
+                raise Exception(
+                    "Invalid programming language: {}".format(partition))
         elif partition == 'val':
             patch_val.append(diff)
             label_val.append(label)
@@ -301,7 +310,8 @@ def get_data():
 
 
 def get_input_and_mask(tokenizer, code):
-    inputs = tokenizer(code, padding='max_length', max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code, padding='max_length',
+                       max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -319,8 +329,10 @@ def retrieve_patch_data(all_data, all_label, all_url):
         code_list = []
 
         for count, file in enumerate(hunk_list):
-            added_code = preprocess_variant_3.get_code_version(diff=file, added_version=True)
-            deleted_code = preprocess_variant_3.get_code_version(diff=file, added_version=False)
+            added_code = preprocess_variant_3.get_code_version(
+                diff=file, added_version=True)
+            deleted_code = preprocess_variant_3.get_code_version(
+                diff=file, added_version=False)
 
             code = added_code + tokenizer.sep_token + deleted_code
             code_list.append(code)
@@ -333,7 +345,7 @@ def retrieve_patch_data(all_data, all_label, all_url):
 
     return id_to_input_list, id_to_mask_list, id_to_label, id_to_url
 
-import gc
+
 def do_train():
     print("Dataset name: {}".format(dataset_name))
     print("Saving model to: {}".format(BEST_MODEL_PATH))
@@ -358,21 +370,31 @@ def do_train():
         test_python_ids.append(index)
         index += 1
 
-    all_data = patch_data['train'] + patch_data['val'] + patch_data['test_java'] + patch_data['test_python']
-    all_label = label_data['train'] + label_data['val'] + label_data['test_java'] + label_data['test_python']
-    all_url = url_data['train'] + url_data['val'] + url_data['test_java'] + url_data['test_python']
+    all_data = patch_data['train'] + patch_data['val'] + \
+        patch_data['test_java'] + patch_data['test_python']
+    all_label = label_data['train'] + label_data['val'] + \
+        label_data['test_java'] + label_data['test_python']
+    all_url = url_data['train'] + url_data['val'] + \
+        url_data['test_java'] + url_data['test_python']
 
     print("Preparing commit patch data...")
-    id_to_input_list, id_to_mask_list, id_to_label, id_to_url = retrieve_patch_data(all_data, all_label, all_url)
+    id_to_input_list, id_to_mask_list, id_to_label, id_to_url = retrieve_patch_data(
+        all_data, all_label, all_url)
     print("Finish preparing commit patch data")
 
-    training_set = VariantThreeFineTuneDataset(train_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
-    val_set = VariantThreeFineTuneDataset(val_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
-    test_java_set = VariantThreeFineTuneDataset(test_java_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
+    training_set = VariantThreeFineTuneDataset(
+        train_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
+    val_set = VariantThreeFineTuneDataset(
+        val_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
+    test_java_set = VariantThreeFineTuneDataset(
+        test_java_ids, id_to_label, id_to_url, id_to_input_list, id_to_mask_list)
 
-    training_generator = DataLoader(training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
-    val_generator = DataLoader(val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
-    test_java_generator = DataLoader(test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
+    training_generator = DataLoader(
+        training_set, **TRAIN_PARAMS, collate_fn=custom_collate)
+    val_generator = DataLoader(
+        val_set, **VALIDATION_PARAMS, collate_fn=custom_collate)
+    test_java_generator = DataLoader(
+        test_java_set, **TEST_PARAMS, collate_fn=custom_collate)
     del training_set
     del val_set
     del test_java_set
@@ -396,9 +418,8 @@ def do_train():
           test_python_generator=None)
 
 
-import sys
 def sizeof_fmt(num, suffix='B'):
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return "%3.1f %s%s" % (num, unit, suffix)
         num /= 1024.0

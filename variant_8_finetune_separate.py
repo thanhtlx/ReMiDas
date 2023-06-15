@@ -220,6 +220,8 @@ def retrieve_patch_data(all_data, all_label, all_url):
         for count, line in enumerate(line_list):
             code = tokenizer.sep_token + line
             code_list.append(code)
+        while len(code_list) < 5:
+            code_list.append(tokenizer.sep_token)
 
         input_ids_list, mask_list = get_input_and_mask(tokenizer, code_list)
         for j in range(len(input_ids_list)):
