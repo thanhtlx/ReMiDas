@@ -36,7 +36,7 @@ def get_input_and_mask(tokenizer, code_list):
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    for line in lines:
+    for line in lines[:100]:
         if len(line.split()) > 50:
             print(f"IGNORE: {len(line.split())}")
             continue
