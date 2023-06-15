@@ -42,13 +42,13 @@ def get_code_version(diff, added_version):
     lines = diff.splitlines()
     # change
     # for line in lines
-    for line in lines[:150]:
+    for line in lines[:100]:
         mark = '+'
         if not added_version:
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/')):
                 continue
             code = code + line + '\n'
 
@@ -198,7 +198,7 @@ def get_data():
                 added_code_list.append(added_code)
                 added_url_list.append(url)
 
-        if len(removed_code_list) >= 50 or len(added_code_list) >= 50:
+        if len(removed_code_list) >= 10 or len(added_code_list) >= 10:
             removed_embeddings = get_hunk_embeddings(
                 removed_code_list, tokenizer, code_bert)
             added_embeddings = get_hunk_embeddings(

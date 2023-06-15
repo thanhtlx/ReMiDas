@@ -49,7 +49,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/')):
                 continue
             code = code + line + '\n'
 
@@ -175,7 +175,7 @@ def get_data():
             code = removed_code + tokenizer.sep_token + added_code
             code_list.append(code)
             url_list.append(url)
-            print(code_list)
+            print(len(code_list.split()))
 
         if len(url_list) >= 3:
             write_embeddings_to_files(
