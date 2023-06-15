@@ -18,7 +18,7 @@ dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset_new.csv'
 dataset_name = 'big_vf.csv'
 dataset_name = 'test.csv'
-CODE_LINE_LENGTH = 128
+CODE_LINE_LENGTH = 64
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -172,7 +172,7 @@ def get_data():
             code_list.append(code)
             url_list.append(url)
 
-        if len(url_list) >= 50:
+        if len(url_list) >= 20:
             write_embeddings_to_files(
                 code_list, url_list, tokenizer, code_bert)
             code_list = []
