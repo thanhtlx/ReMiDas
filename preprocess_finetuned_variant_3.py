@@ -60,7 +60,7 @@ def get_hunk_embeddings(code_list, tokenizer, code_bert):
     # process all lines in one
     
     input_ids, attention_mask = get_input_and_mask(tokenizer, code_list)
-    print(input_ids.shape)
+    print(input_ids)
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
