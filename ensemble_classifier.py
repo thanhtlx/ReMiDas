@@ -274,10 +274,12 @@ def do_train(args):
     # feature_data['test_python'] = []
 
     for url in url_data['train']:
-        feature_data['train'].append(url_to_features[url])
+        if url in url_to_features:
+            feature_data['train'].append(url_to_features[url])
 
     for url in url_data['test_java']:
-        feature_data['test_java'].append(url_to_features[url])
+        if url in url_to_features:
+            feature_data['test_java'].append(url_to_features[url])
 
     # for url in url_data['test_python']:
     #     feature_data['test_python'].append(url_to_features[url])
