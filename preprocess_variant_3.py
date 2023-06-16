@@ -37,12 +37,14 @@ def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
     for line in lines:
+        if len(line.split()) > 50:
+            continue
         mark = '+'
         if not added_version:
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/')):
                 continue
             code = code + line + '\n'
 

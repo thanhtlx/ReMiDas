@@ -36,13 +36,16 @@ def get_input_and_mask(tokenizer, code_list):
 def get_code_version(diff, added_version):
     code = ''
     lines = diff.splitlines()
-    for line in lines:
+    for line in lines[:100]:
+        if len(line.split()) > 50:
+            print(f"IGNORE: {len(line.split())}")
+            continue
         mark = '+'
         if not added_version:
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')) or line.strip() == '':
+            if line.startswith(('//', '/**', '/*', '*/')) or line.strip() == '':
                 continue
             code = code + line + '\n'
 

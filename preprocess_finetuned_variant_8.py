@@ -52,7 +52,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')) or line.strip() == '':
+            if line.startswith(('//', '/**', '/*', '*/')) or line.strip() == '':
                 continue
             code = code + line + '\n'
 

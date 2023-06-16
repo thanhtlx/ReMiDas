@@ -38,7 +38,7 @@ def get_code_version(diff, added_version):
             mark = '-'
         if line.startswith(mark):
             line = line[1:].strip()
-            if line.startswith(('//', '/**', '/*', '*/', '#')):
+            if line.startswith(('//', '/**', '/*', '*/')):
                 continue
             code = code + line + '\n'
 
@@ -139,7 +139,7 @@ def get_data():
             added_code_list.append(added_code)
             url_list.append(url)
 
-        if len(url_list) >= 200:
+        if len(url_list) >= 100:
             write_embeddings_to_files(removed_code_list, added_code_list, url_list, tokenizer, code_bert)
 
             removed_code_list = []
