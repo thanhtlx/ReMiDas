@@ -266,8 +266,9 @@ def do_train(args):
     url_to_features.update(read_feature_list(test_java_feature_path))
 
     print("Finish reading")
-    url_data, label_data = utils.get_data(dataset_name)
-
+    url_data, label_data = utils.get_data(
+        dataset_name, url_set=url_to_features.keys())
+    print(len(url_data['train']) + len(url_data['test_java']))
     feature_data = {}
     feature_data['train'] = []
     feature_data['test_java'] = []
