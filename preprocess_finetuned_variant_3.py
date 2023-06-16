@@ -76,7 +76,6 @@ def get_hunk_embeddings(code_list, tokenizer, code_bert):
 
 
 def write_embeddings_to_files(code_list, url_list, tokenizer, code_bert):
-    
     hunk_embeddings = get_hunk_embeddings(code_list, tokenizer, code_bert)
     url_to_embeddings = {}
     for index, url in enumerate(url_list):
@@ -169,13 +168,12 @@ def get_data():
             directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
             continue
-        for i, diff in enumerate(diff_list):
+        for i, diff in enumerate(diff_list[:100]):
             removed_code = get_code_version(diff, False)
             added_code = get_code_version(diff, True)
             code = removed_code + tokenizer.sep_token + added_code
             code_list.append(code)
             url_list.append(url)
-            print(len(code.split()))
 
         if len(url_list) >= 3:
             write_embeddings_to_files(
