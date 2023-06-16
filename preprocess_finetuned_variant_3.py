@@ -164,7 +164,7 @@ def get_data():
             directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
             continue
-        for i, diff in enumerate(diff_list[:500]):
+        for i, diff in enumerate(diff_list[:1000]):
             removed_code = get_code_version(diff, False)
             added_code = get_code_version(diff, True)
             code = removed_code + tokenizer.sep_token + added_code

@@ -24,8 +24,8 @@ from variant_ensemble import write_feature_to_file
 directory = os.path.dirname(os.path.abspath(__file__))
 dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
-#change
-dataset_name ='test.csv'
+# change
+dataset_name = 'test.csv'
 
 FINAL_MODEL_PATH = None
 JAVA_RESULT_PATH = None
@@ -35,9 +35,12 @@ TRAIN_BATCH_SIZE = 128
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 NUMBER_OF_EPOCHS = 20
@@ -69,14 +72,16 @@ def read_features_from_file(file_path):
 def read_feature_list(file_path_list, reshape=False, need_list=False, need_extend=False):
     url_to_feature = {}
     for file_path in file_path_list:
+        print(file_path)
         data = read_features_from_file(file_path)
+        print(len(data))
         for url, feature in data.items():
             if url not in url_to_feature:
                 url_to_feature[url] = []
             if not need_extend:
                 url_to_feature[url].append(feature)
             else:
-                url_to_feature[url].extend(feature) 
+                url_to_feature[url].extend(feature)
     if not reshape:
         return url_to_feature
     else:
@@ -92,8 +97,6 @@ def read_feature_list(file_path_list, reshape=False, need_list=False, need_exten
                 url_to_combined[url] = combine
 
         return url_to_combined
-
-
 
 
 def predict_test_data(model, testing_generator, device, need_prob=False, need_features=False):
@@ -114,8 +117,9 @@ def predict_test_data(model, testing_generator, device, need_prob=False, need_fe
             feature_8 = feature_8.to(device)
 
             label_batch = label_batch.to(device)
-                
-            outs, pca_features = model(feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8, need_features=True)
+
+            outs, pca_features = model(
+                feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8, need_features=True)
 
             outs = F.softmax(outs, dim=1)
 
@@ -168,7 +172,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, test_java_
 
             label_batch = label_batch.to(device)
 
-            outs = model(feature_1, feature_2, feature_3, feature_5, feature_6, feature_7, feature_8)
+            outs = model(feature_1, feature_2, feature_3,
+                         feature_5, feature_6, feature_7, feature_8)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
             train_losses.append(loss.item())
@@ -183,16 +188,15 @@ def train(model, learning_rate, number_of_epochs, training_generator, test_java_
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
         train_losses = []
         model.eval()
 
-
-
     print("Result on Java testing dataset...")
     precision, recall, f1, auc, urls, probs, features = predict_test_data(model=model,
-                                                testing_generator=test_java_generator,
-                                                device=device, need_prob=True)
+                                                                          testing_generator=test_java_generator,
+                                                                          device=device, need_prob=True)
     print("Precision: {}".format(precision))
     print("Recall: {}".format(recall))
     print("F1: {}".format(f1))
@@ -218,7 +222,6 @@ def do_train(args):
     JAVA_RESULT_PATH = args.java_result_path
     if JAVA_RESULT_PATH is None or JAVA_RESULT_PATH == '':
         raise Exception("Java result path must not be None or empty")
-
 
     variant_to_drop = []
     if args.variant_to_drop is not None:
@@ -299,9 +302,10 @@ def do_train(args):
         id_to_feature[index] = feature_data['test_java'][i]
         index += 1
 
-
-    training_set = EnsembleDataset(val_ids, id_to_label, id_to_url, id_to_feature)
-    test_java_set = EnsembleDataset(test_java_ids, id_to_label, id_to_url, id_to_feature)
+    training_set = EnsembleDataset(
+        val_ids, id_to_label, id_to_url, id_to_feature)
+    test_java_set = EnsembleDataset(
+        test_java_ids, id_to_label, id_to_url, id_to_feature)
     # test_python_set = EnsembleDataset(test_python_ids, id_to_label, id_to_url, id_to_feature)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
@@ -324,6 +328,7 @@ def do_train(args):
           test_java_generator=test_java_generator,
           test_python_generator=None)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Ensemble Classifier')
     parser.add_argument('--ablation_study',
@@ -339,8 +344,8 @@ if __name__ == '__main__':
                         type=str,
                         help='IMPORTANT select path to save model')
     parser.add_argument('--java_result_path',
-                       type=str,
-                       help='path to save prediction for Java projects')
+                        type=str,
+                        help='path to save prediction for Java projects')
     # parser.add_argument('--python_result_path',
     #                     type=str,
     #                     help='path to save prediction for Python projects')
