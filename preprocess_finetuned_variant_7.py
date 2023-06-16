@@ -187,7 +187,7 @@ def get_data():
             # print(file_path)
             continue
 
-        for i, diff in enumerate(diff_list):
+        for i, diff in enumerate(diff_list[:500]):
             removed_code = get_code_version(diff, False)
             if removed_code.strip() != '':
                 removed_code_list.append(removed_code)
