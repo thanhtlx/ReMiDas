@@ -165,11 +165,9 @@ def get_data():
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
     print(df.shape)
-    print(len(set(df['commit_id'])))
     df = df[['commit_id', 'repo', 'partition',
              'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
-    print(len(items))
 
     url_to_diff = {}
 

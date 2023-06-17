@@ -15,7 +15,7 @@ FINE_TUNED_MODEL_PATH = 'model/patch_variant_6_finetuned_model.sav'
 
 dataset_name = 'ase_dataset_sept_19_2021.csv'
 
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 CODE_LINE_LENGTH = 256
 
 use_cuda = cuda.is_available()
@@ -46,7 +46,8 @@ def get_code_version(diff, added_version):
 
 
 def get_input_and_mask(tokenizer, code_list):
-    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code_list, padding=True, max_length=CODE_LINE_LENGTH,
+                       truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -58,14 +59,17 @@ def get_file_embeddings(code_list, tokenizer, code_bert):
     with torch.no_grad():
         input_ids = input_ids.to(device)
         attention_mask = attention_mask.to(device)
-        embeddings = code_bert(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
+        embeddings = code_bert(
+            input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0, :]
     embeddings = embeddings.tolist()
     return embeddings
 
 
 def write_embeddings_to_files(removed_code_list, added_code_list, url_list, tokenizer, code_bert):
-    removed_embeddings = get_file_embeddings(removed_code_list, tokenizer, code_bert)
-    added_embeddings = get_file_embeddings(added_code_list, tokenizer, code_bert)
+    removed_embeddings = get_file_embeddings(
+        removed_code_list, tokenizer, code_bert)
+    added_embeddings = get_file_embeddings(
+        added_code_list, tokenizer, code_bert)
 
     url_to_removed_embeddings = {}
     url_to_added_embeddings = {}
@@ -86,7 +90,7 @@ def write_embeddings_to_files(removed_code_list, added_code_list, url_list, toke
     for url, data in url_to_data.items():
         file_path = os.path.join(directory, EMBEDDING_DIRECTORY)
         pathlib.Path(file_path).mkdir(parents=True, exist_ok=True)
-        file_path =  file_path + '/' + url.replace('/', '_') + '.txt'
+        file_path = file_path + '/' + url.replace('/', '_') + '.txt'
         json.dump(data, open(file_path, 'w'))
 
 
@@ -111,7 +115,8 @@ def get_data():
 
     print("Reading dataset...")
     df = pd.read_csv(dataset_name)
-    df = df[['commit_id', 'repo', 'partition', 'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
+    df = df[['commit_id', 'repo', 'partition',
+             'diff', 'label', 'PL', 'LOC_MOD', 'filename']]
     items = df.to_numpy().tolist()
 
     url_to_diff = {}
@@ -130,7 +135,11 @@ def get_data():
     removed_code_list = []
     added_code_list = []
     url_list = []
+    print(len(url_to_diff))
+    count = 0
     for url, diff_list in tqdm.tqdm(url_to_diff.items()):
+        print(count, url)
+        count += 1
         for i, diff in enumerate(diff_list):
             removed_code = tokenizer.sep_token + get_code_version(diff, False)
             added_code = tokenizer.sep_token + get_code_version(diff, True)
@@ -140,13 +149,15 @@ def get_data():
             url_list.append(url)
 
         if len(url_list) >= 100:
-            write_embeddings_to_files(removed_code_list, added_code_list, url_list, tokenizer, code_bert)
+            write_embeddings_to_files(
+                removed_code_list, added_code_list, url_list, tokenizer, code_bert)
 
             removed_code_list = []
             added_code_list = []
             url_list = []
 
-    write_embeddings_to_files(removed_code_list, added_code_list, url_list, tokenizer, code_bert)
+    write_embeddings_to_files(
+        removed_code_list, added_code_list, url_list, tokenizer, code_bert)
 
 
 if __name__ == '__main__':
