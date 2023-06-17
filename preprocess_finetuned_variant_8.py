@@ -183,7 +183,7 @@ def get_data():
             url_to_diff[url] = ''
 
         url_to_diff[url] = url_to_diff[url] + diff + '\n'
-
+    print(len(url_to_diff))
     removed_code_list = []
     added_code_list = []
     removed_url_list = []
@@ -192,6 +192,7 @@ def get_data():
         file_path = os.path.join(
             directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
         if os.path.isfile(file_path):
+            print(file_path)
             continue
 
         removed_code = get_code_version(diff, False)
