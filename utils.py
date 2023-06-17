@@ -35,7 +35,7 @@ def get_data(dataset_name, need_pl=False, url_set=None):
         commit_id = item[0]
         repo = item[1]
         url = repo + '/commit/' + commit_id
-        if url not in url_set:
+        if url_set is not None and url not in url_set:
             continue
         partition = item[2]
         pl = item[3]

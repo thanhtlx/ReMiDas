@@ -160,9 +160,9 @@ def get_data():
             removed_code_list = []
             added_code_list = []
             url_list = []
-
-    write_embeddings_to_files(
-        removed_code_list, added_code_list, url_list, tokenizer, code_bert)
+    if len(url_list) > 0:
+        write_embeddings_to_files(
+            removed_code_list, added_code_list, url_list, tokenizer, code_bert)
 
 
 if __name__ == '__main__':
