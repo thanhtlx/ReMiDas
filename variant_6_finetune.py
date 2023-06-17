@@ -19,7 +19,7 @@ import preprocess_variant_1
 
 dataset_name = 'huawei_sub_dataset.csv'
 # dataset_name = 'ase_dataset_sept_19_2021.csv'
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 
 BEST_MODEL_PATH = 'model/patch_variant_6_finetune_best_model.sav'
 FINE_TUNED_MODEL_PATH = 'model/patch_variant_6_finetuned_model.sav'
@@ -41,9 +41,12 @@ VALIDATION_BATCH_SIZE = 32
 TEST_BATCH_SIZE = 32
 EARLY_STOPPING_ROUND = 5
 
-TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TRAIN_PARAMS = {'batch_size': TRAIN_BATCH_SIZE,
+                'shuffle': True, 'num_workers': 8}
+VALIDATION_PARAMS = {'batch_size': VALIDATION_BATCH_SIZE,
+                     'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 
 LEARNING_RATE = 1e-5
 
@@ -59,7 +62,8 @@ CODE_LENGTH = 256
 
 
 def get_input_and_mask(tokenizer, code):
-    inputs = tokenizer(code, padding='max_length', max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
+    inputs = tokenizer(code, padding='max_length',
+                       max_length=CODE_LENGTH, truncation=True, return_tensors="pt")
 
     return inputs.data['input_ids'], inputs.data['attention_mask']
 
@@ -78,7 +82,8 @@ def predict_test_data(model, testing_generator, device, need_prob=False):
             removed_input_list_batch = removed_input_list_batch.to(device)
             removed_mask_list_batch = removed_mask_list_batch.to(device)
 
-            outs = model(added_input_list_batch, added_mask_list_batch, removed_input_list_batch, removed_mask_list_batch)
+            outs = model(added_input_list_batch, added_mask_list_batch,
+                         removed_input_list_batch, removed_mask_list_batch)
             outs = F.softmax(outs, dim=1)
             y_pred.extend(torch.argmax(outs, dim=1).tolist())
             y_test.extend(label_batch.tolist())
@@ -108,8 +113,9 @@ def get_avg_validation_loss(model, validation_generator, loss_function):
             added_mask_list_batch = added_mask_list_batch.to(device)
             removed_input_list_batch = removed_input_list_batch.to(device)
             removed_mask_list_batch = removed_mask_list_batch.to(device)
-            label_batch= label_batch.to(device)
-            outs = model(added_input_list_batch, added_mask_list_batch, removed_input_list_batch, removed_mask_list_batch)
+            label_batch = label_batch.to(device)
+            outs = model(added_input_list_batch, added_mask_list_batch,
+                         removed_input_list_batch, removed_mask_list_batch)
             outs = F.log_softmax(outs, dim=1)
             loss = loss_function(outs, label_batch)
             validation_loss += loss
@@ -161,7 +167,8 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
                 print("Train commit iter {}, total loss {}, average loss {}".format(current_batch, np.sum(train_losses),
                                                                                     np.average(train_losses)))
 
-        print("epoch {}, training commit loss {}".format(epoch, np.sum(train_losses)))
+        print("epoch {}, training commit loss {}".format(
+            epoch, np.sum(train_losses)))
         train_losses = []
 
         model.eval()
@@ -170,7 +177,7 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         val_loss = get_avg_validation_loss(model, val_generator, loss_function)
         print("Average validation loss of this iteration: {}".format(val_loss))
         print("-" * 32)
-        
+
         early_stopping(val_loss, model)
         #
         # print("Result on Java testing dataset...")
@@ -184,7 +191,6 @@ def train(model, learning_rate, number_of_epochs, training_generator, val_genera
         # print("AUC: {}".format(auc))
         # print("-" * 32)
         #
-
 
         if early_stopping.early_stop:
             print("Early stopping")
@@ -219,8 +225,12 @@ def retrieve_patch_data(all_data, all_label, all_url):
             if count >= LIMIT_FILE_COUNT:
                 continue
 
-            added_code = tokenizer.sep_token + preprocess_variant_1.get_code_version(diff=file, added_version=True)
-            deleted_code = tokenizer.sep_token +  preprocess_variant_1.get_code_version(diff=file, added_version=False)
+            added_code = tokenizer.sep_token + \
+                preprocess_variant_1.get_code_version(
+                    diff=file, added_version=True)
+            deleted_code = tokenizer.sep_token + \
+                preprocess_variant_1.get_code_version(
+                    diff=file, added_version=False)
 
             added_code_list.append(added_code)
             removed_code_list.append(deleted_code)
@@ -232,11 +242,13 @@ def retrieve_patch_data(all_data, all_label, all_url):
         while len(removed_code_list) < 5:
             removed_code_list.append(tokenizer.sep_token)
 
-        input_ids_list, mask_list = get_input_and_mask(tokenizer, added_code_list)
+        input_ids_list, mask_list = get_input_and_mask(
+            tokenizer, added_code_list)
         id_to_added_input_list[i] = input_ids_list
         id_to_added_mask_list[i] = mask_list
 
-        input_ids_list, mask_list = get_input_and_mask(tokenizer, removed_code_list)
+        input_ids_list, mask_list = get_input_and_mask(
+            tokenizer, removed_code_list)
         id_to_removed_input_list[i] = input_ids_list
         id_to_removed_mask_list[i] = mask_list
 
@@ -299,7 +311,8 @@ def get_data():
                 label_test_python.append(label)
                 url_test_python.append(url)
             else:
-                raise Exception("Invalid programming language: {}".format(partition))
+                raise Exception(
+                    "Invalid programming language: {}".format(partition))
         elif partition == 'val':
             patch_val.append(diff)
             label_val.append(label)
@@ -344,24 +357,30 @@ def do_train():
         test_python_ids.append(index)
         index += 1
 
-    all_data = patch_data['train'] + patch_data['val'] + patch_data['test_java'] + patch_data['test_python']
-    all_label = label_data['train'] + label_data['val'] + label_data['test_java'] + label_data['test_python']
-    all_url = url_data['train'] + url_data['val'] + url_data['test_java'] + url_data['test_python']
+    all_data = patch_data['train'] + patch_data['val'] + \
+        patch_data['test_java'] + patch_data['test_python']
+    all_label = label_data['train'] + label_data['val'] + \
+        label_data['test_java'] + label_data['test_python']
+    all_url = url_data['train'] + url_data['val'] + \
+        url_data['test_java'] + url_data['test_python']
 
     print("Preparing commit patch data...")
     id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list, id_to_label, id_to_url \
         = retrieve_patch_data(all_data, all_label, all_url)
     print("Finish preparing commit patch data")
 
-    training_set = VariantSixFineTuneDataset(train_ids, id_to_label, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
-    val_set = VariantSixFineTuneDataset(val_ids, id_to_label, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
-    test_java_set = VariantSixFineTuneDataset(test_java_ids, id_to_label, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
-    #test_python_set = VariantSixFineTuneDataset(test_python_ids, id_to_label, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
+    training_set = VariantSixFineTuneDataset(train_ids, id_to_label, id_to_url, id_to_added_input_list,
+                                             id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
+    val_set = VariantSixFineTuneDataset(val_ids, id_to_label, id_to_url, id_to_added_input_list,
+                                        id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
+    test_java_set = VariantSixFineTuneDataset(test_java_ids, id_to_label, id_to_url, id_to_added_input_list,
+                                              id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
+    # test_python_set = VariantSixFineTuneDataset(test_python_ids, id_to_label, id_to_url, id_to_added_input_list, id_to_added_mask_list, id_to_removed_input_list, id_to_removed_mask_list)
 
     training_generator = DataLoader(training_set, **TRAIN_PARAMS)
     val_generator = DataLoader(val_set, **VALIDATION_PARAMS)
     test_java_generator = DataLoader(test_java_set, **TEST_PARAMS)
-    #test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
+    # test_python_generator = DataLoader(test_python_set, **TEST_PARAMS)
 
     model = VariantSixFineTuneClassifier()
 

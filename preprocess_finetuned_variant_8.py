@@ -20,7 +20,6 @@ dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset_new.csv'
 dataset_name = 'big_vf.csv'
 dataset_name = 'test.csv'
-# change 32
 CODE_LINE_LENGTH = 64
 
 

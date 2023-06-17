@@ -19,7 +19,7 @@ dataset_name = 'ase_dataset_sept_19_2021.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
 dataset_name = 'big_vf.csv'
 dataset_name = 'test.csv'
-CODE_LINE_LENGTH = 128
+CODE_LINE_LENGTH = 256
 
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
@@ -42,7 +42,7 @@ def get_code_version(diff, added_version):
     lines = diff.splitlines()
     # change
     # for line in lines
-    for line in lines[:100]:
+    for line in lines[:150]:
         mark = '+'
         if not added_version:
             mark = '-'

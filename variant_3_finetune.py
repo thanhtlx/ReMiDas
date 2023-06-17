@@ -33,8 +33,6 @@ FINE_TUNED_MODEL_PATH = 'model/patch_variant_3_finetuned_model.sav'
 FINETUNE_EPOCH = 1
 
 NUMBER_OF_EPOCHS = 60
-# change
-NUMBER_OF_EPOCHS = 6
 EARLY_STOPPING_ROUND = 5
 
 TRAIN_BATCH_SIZE = 2
@@ -56,8 +54,6 @@ torch.backends.cudnn.benchmark = True
 
 false_cases = []
 CODE_LENGTH = 256
-# change
-CODE_LENGTH = 32
 HIDDEN_DIM = 768
 # no change hidden dim ??
 HIDDEN_DIM = 32

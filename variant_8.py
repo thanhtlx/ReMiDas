@@ -52,7 +52,7 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = True
 
 false_cases = []
-CODE_LENGTH = 128
+CODE_LENGTH = 512
 HIDDEN_DIM = 768
 
 NUMBER_OF_LABELS = 2

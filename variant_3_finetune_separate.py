@@ -33,7 +33,7 @@ FINETUNE_EPOCH = 1
 NUMBER_OF_EPOCHS = 1
 EARLY_STOPPING_ROUND = 5
 
-TRAIN_BATCH_SIZE = 32
+TRAIN_BATCH_SIZE = 8
 VALIDATION_BATCH_SIZE = 128
 TEST_BATCH_SIZE = 128
 
@@ -51,7 +51,7 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 torch.backends.cudnn.benchmark = True
 
 false_cases = []
-CODE_LENGTH = 128
+CODE_LENGTH = 256
 HIDDEN_DIM = 768
 
 NUMBER_OF_LABELS = 2

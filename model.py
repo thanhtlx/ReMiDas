@@ -541,8 +541,6 @@ class VariantEightClassifier(nn.Module):
     def __init__(self):
         super(VariantEightClassifier, self).__init__()
         self.input_size = 768
-        # change
-        self.hidden_size = 128
         self.hidden_size = 128
         self.HIDDEN_DIM_DROPOUT_PROB = 0.3
         self.lstm = nn.LSTM(input_size=self.input_size,
