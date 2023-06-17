@@ -30,13 +30,13 @@ import json
 # dataset_name = 'huawei_csv_subset_slicing_limited_10.csv'
 # dataset_name = 'huawei_sub_dataset.csv'
 dataset_name = 'ase_dataset_sept_19_2021.csv'
-dataset_name ='test.csv'
+dataset_name = 'test.csv'
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
 model_folder_path = os.path.join(directory, 'model')
 
-#change
+# change
 VARIANT_ONE_EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_1'
 VARIANT_TWO_EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_2'
 VARIANT_THREE_EMBEDDINGS_DIRECTORY = 'finetuned_embeddings/variant_3'
@@ -66,7 +66,8 @@ VARIANT_SEVEN_FCN_MODEL_PATH = 'model/patch_variant_7_fcn.sav'
 
 TEST_BATCH_SIZE = 64
 
-TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE, 'shuffle': True, 'num_workers': 8}
+TEST_PARAMS = {'batch_size': TEST_BATCH_SIZE,
+               'shuffle': True, 'num_workers': 8}
 use_cuda = cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 random_seed = 109
@@ -106,16 +107,19 @@ def infer_variant_1(partition, result_file_path, need_feature_only=False):
     model.to(device)
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantOneDataset(ids, id_to_label, id_to_url, VARIANT_ONE_EMBEDDINGS_DIRECTORY)
+    dataset = VariantOneDataset(
+        ids, id_to_label, id_to_url, VARIANT_ONE_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
 
     if need_feature_only:
-        auc, urls, features = variant_1.predict_test_data(model, generator, device, need_prob=True, need_feature_only=need_feature_only)
+        auc, urls, features = variant_1.predict_test_data(
+            model, generator, device, need_prob=True, need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
 
     else:
-        precision, recall, f1, auc, urls, probs = variant_1.predict_test_data(model, generator, device, need_prob=True, need_feature_only=need_feature_only)
+        precision, recall, f1, auc, urls, probs = variant_1.predict_test_data(
+            model, generator, device, need_prob=True, need_feature_only=need_feature_only)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -141,15 +145,18 @@ def infer_variant_2(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_TWO_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantTwoDataset(ids, id_to_label, id_to_url, VARIANT_TWO_EMBEDDINGS_DIRECTORY)
+    dataset = VariantTwoDataset(
+        ids, id_to_label, id_to_url, VARIANT_TWO_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
 
     if need_feature_only:
-        auc, urls, features = variant_2.predict_test_data(model, generator, device, need_prob=True, need_feature_only=need_feature_only)
+        auc, urls, features = variant_2.predict_test_data(
+            model, generator, device, need_prob=True, need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_2.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_2.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -175,15 +182,18 @@ def infer_variant_3_fcn(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_THREE_FCN_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantThreeFcnDataset(ids, id_to_label, id_to_url, VARIANT_THREE_EMBEDDINGS_DIRECTORY)
+    dataset = VariantThreeFcnDataset(
+        ids, id_to_label, id_to_url, VARIANT_THREE_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
 
     if need_feature_only:
-        auc, urls, features = variant_3_fcn.predict_test_data(model, generator, device, need_prob=True, need_feature_only=need_feature_only)
+        auc, urls, features = variant_3_fcn.predict_test_data(
+            model, generator, device, need_prob=True, need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_3_fcn.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_3_fcn.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -208,8 +218,10 @@ def infer_variant_2_cnn(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_TWO_CNN_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantThreeDataset(ids, id_to_label, id_to_url, VARIANT_TWO_CNN_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_3.custom_collate)
+    dataset = VariantThreeDataset(
+        ids, id_to_label, id_to_url, VARIANT_TWO_CNN_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_3.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_3.predict_test_data(model, generator, device, need_prob=True,
@@ -217,7 +229,8 @@ def infer_variant_2_cnn(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_3.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_3.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -226,7 +239,6 @@ def infer_variant_2_cnn(partition, result_file_path, need_feature_only=False):
         print("-" * 32)
 
         write_prob_to_file(result_file_path, urls, probs)
-
 
 
 def infer_variant_3(partition, result_file_path, need_feature_only=False):
@@ -243,8 +255,10 @@ def infer_variant_3(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_THREE_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantThreeDataset(ids, id_to_label, id_to_url, VARIANT_THREE_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_3.custom_collate)
+    dataset = VariantThreeDataset(
+        ids, id_to_label, id_to_url, VARIANT_THREE_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_3.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_3.predict_test_data(model, generator, device, need_prob=True,
@@ -252,7 +266,8 @@ def infer_variant_3(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_3.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_3.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -277,7 +292,8 @@ def infer_variant_5(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_FIVE_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantFiveDataset(ids, id_to_label, id_to_url, VARIANT_FIVE_EMBEDDINGS_DIRECTORY)
+    dataset = VariantFiveDataset(
+        ids, id_to_label, id_to_url, VARIANT_FIVE_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
 
     if need_feature_only:
@@ -286,7 +302,8 @@ def infer_variant_5(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_5.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_5.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -311,16 +328,19 @@ def infer_variant_6(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_SIX_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantSixDataset(ids, id_to_label, id_to_url, VARIANT_SIX_EMBEDDINGS_DIRECTORY)
+    print(len(id_to_label), len(id_to_url))
+    dataset = VariantSixDataset(
+        ids, id_to_label, id_to_url, VARIANT_SIX_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
-
+    print(len(generator.dataset))
     if need_feature_only:
         auc, urls, features = variant_6.predict_test_data(model, generator, device, need_prob=True,
                                                           need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_6.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_6.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -345,16 +365,18 @@ def infer_variant_7_fcn(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_SEVEN_FCN_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantSixDataset(ids, id_to_label, id_to_url, VARIANT_SEVEN_EMBEDDINGS_DIRECTORY)
+    dataset = VariantSixDataset(
+        ids, id_to_label, id_to_url, VARIANT_SEVEN_EMBEDDINGS_DIRECTORY)
     generator = DataLoader(dataset, **TEST_PARAMS)
 
     if need_feature_only:
         auc, urls, features = variant_7_fcn.predict_test_data(model, generator, device, need_prob=True,
-                                                          need_feature_only=need_feature_only)
+                                                              need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_7_fcn.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_7_fcn.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -380,8 +402,10 @@ def infer_variant_6_cnn(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_SIX_CNN_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantSevenDataset(ids, id_to_label, id_to_url, VARIANT_SIX_CNN_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_7.custom_collate)
+    dataset = VariantSevenDataset(
+        ids, id_to_label, id_to_url, VARIANT_SIX_CNN_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_7.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_7.predict_test_data(model, generator, device, need_prob=True,
@@ -389,7 +413,8 @@ def infer_variant_6_cnn(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_7.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_7.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -415,8 +440,10 @@ def infer_variant_7(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_SEVEN_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantSevenDataset(ids, id_to_label, id_to_url, VARIANT_SEVEN_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_7.custom_collate)
+    dataset = VariantSevenDataset(
+        ids, id_to_label, id_to_url, VARIANT_SEVEN_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_7.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_7.predict_test_data(model, generator, device, need_prob=True,
@@ -424,7 +451,8 @@ def infer_variant_7(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_7.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_7.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -450,8 +478,10 @@ def infer_variant_8(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_EIGHT_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_8.custom_collate)
+    dataset = VariantEightDataset(
+        ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_8.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_8.predict_test_data(model, generator, device, need_prob=True,
@@ -459,7 +489,8 @@ def infer_variant_8(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_8.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_8.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -485,16 +516,19 @@ def infer_variant_8_lstm(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_EIGHT_LSTM_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_8_lstm.custom_collate)
+    dataset = VariantEightDataset(
+        ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_8_lstm.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_8_lstm.predict_test_data(model, generator, device, need_prob=True,
-                                                          need_feature_only=need_feature_only)
+                                                               need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_8_lstm.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_8_lstm.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -520,16 +554,19 @@ def infer_variant_8_gru(partition, result_file_path, need_feature_only=False):
     model.load_state_dict(torch.load(VARIANT_EIGHT_GRU_MODEL_PATH))
 
     ids, id_to_label, id_to_url = get_dataset_info(partition)
-    dataset = VariantEightDataset(ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
-    generator = DataLoader(dataset, **TEST_PARAMS, collate_fn=variant_8_gru.custom_collate)
+    dataset = VariantEightDataset(
+        ids, id_to_label, id_to_url, VARIANT_EIGHT_EMBEDDINGS_DIRECTORY)
+    generator = DataLoader(dataset, **TEST_PARAMS,
+                           collate_fn=variant_8_gru.custom_collate)
 
     if need_feature_only:
         auc, urls, features = variant_8_gru.predict_test_data(model, generator, device, need_prob=True,
-                                                          need_feature_only=need_feature_only)
+                                                              need_feature_only=need_feature_only)
         print("AUC: {}".format(auc))
         write_feature_to_file(result_file_path, urls, features)
     else:
-        precision, recall, f1, auc, urls, probs = variant_8_gru.predict_test_data(model, generator, device, need_prob=True)
+        precision, recall, f1, auc, urls, probs = variant_8_gru.predict_test_data(
+            model, generator, device, need_prob=True)
 
         print("Precision: {}".format(precision))
         print("Recall: {}".format(recall))
@@ -537,8 +574,8 @@ def infer_variant_8_gru(partition, result_file_path, need_feature_only=False):
         print("AUC: {}".format(auc))
         print("-" * 32)
 
-        write_prob_to_file(result_file_path, urls, probs) 
-        
+        write_prob_to_file(result_file_path, urls, probs)
+
 
 def get_dataset_info(partition):
     url_data, label_data = utils.get_data(dataset_name)
@@ -568,13 +605,20 @@ def read_pred_prob(file_path):
 
 def get_auc_max_ensemble():
     print("Reading result...")
-    variant_1_result = read_pred_prob('probs/prob_variant_1_finetune_1_epoch_test_python.txt')
-    variant_2_result = read_pred_prob('probs/prob_variant_2_finetune_1_epoch_test_python.txt')
-    variant_3_result = read_pred_prob('probs/prob_variant_3_finetune_1_epoch_test_python.txt')
-    variant_5_result = read_pred_prob('probs/prob_variant_5_finetune_1_epoch_test_python.txt')
-    variant_6_result = read_pred_prob('probs/prob_variant_6_finetune_1_epoch_test_python.txt')
-    variant_7_result = read_pred_prob('probs/prob_variant_7_finetune_1_epoch_test_python.txt')
-    variant_8_result = read_pred_prob('probs/prob_variant_8_finetune_1_epoch_test_python.txt')
+    variant_1_result = read_pred_prob(
+        'probs/prob_variant_1_finetune_1_epoch_test_python.txt')
+    variant_2_result = read_pred_prob(
+        'probs/prob_variant_2_finetune_1_epoch_test_python.txt')
+    variant_3_result = read_pred_prob(
+        'probs/prob_variant_3_finetune_1_epoch_test_python.txt')
+    variant_5_result = read_pred_prob(
+        'probs/prob_variant_5_finetune_1_epoch_test_python.txt')
+    variant_6_result = read_pred_prob(
+        'probs/prob_variant_6_finetune_1_epoch_test_python.txt')
+    variant_7_result = read_pred_prob(
+        'probs/prob_variant_7_finetune_1_epoch_test_python.txt')
+    variant_8_result = read_pred_prob(
+        'probs/prob_variant_8_finetune_1_epoch_test_python.txt')
 
     print("Finish reading result")
 
@@ -588,7 +632,8 @@ def get_auc_max_ensemble():
         prob_7 = variant_7_result[url]
         prob_8 = variant_8_result[url]
         # url_to_max_prob[url] = mean([prob_1, prob_2, prob_3, prob_8])
-        url_to_max_prob[url] = mean([prob_1, prob_2, prob_3, prob_5, prob_6, prob_7, prob_8])
+        url_to_max_prob[url] = mean(
+            [prob_1, prob_2, prob_3, prob_5, prob_6, prob_7, prob_8])
 
     url_data, label_data = utils.get_data(dataset_name)
     url_test = url_data['test_python']
@@ -660,7 +705,7 @@ def get_combined_ensemble_model():
                             'probs/prob_variant_6_finetune_1_epoch_val.txt',
                             'probs/prob_variant_7_finetune_1_epoch_val.txt',
                             'probs/prob_variant_8_finetune_1_epoch_val.txt']
-                            # 'variant_7_prob_val.txt']
+    # 'variant_7_prob_val.txt']
 
     test_java_result_path_list = ['probs/prob_variant_1_finetune_1_epoch_test_java.txt',
                                   'probs/prob_variant_2_finetune_1_epoch_test_java.txt',
@@ -669,7 +714,7 @@ def get_combined_ensemble_model():
                                   'probs/prob_variant_6_finetune_1_epoch_test_java.txt',
                                   'probs/prob_variant_7_finetune_1_epoch_test_java.txt',
                                   'probs/prob_variant_8_finetune_1_epoch_test_java.txt']
-                                  # 'variant_7_prob_java.txt']
+    # 'variant_7_prob_java.txt']
 
     test_python_result_path_list = ['probs/prob_variant_1_finetune_1_epoch_test_python.txt',
                                     'probs/prob_variant_2_finetune_1_epoch_test_python.txt',
@@ -678,12 +723,15 @@ def get_combined_ensemble_model():
                                     'probs/prob_variant_6_finetune_1_epoch_test_python.txt',
                                     'probs/prob_variant_7_finetune_1_epoch_test_python.txt',
                                     'probs/prob_variant_8_finetune_1_epoch_test_python.txt']
-                                    # 'variant_7_prob_python.txt']
+    # 'variant_7_prob_python.txt']
 
     # train_prob_list, train_label_list = get_partition_prob_list(train_result_path_list, 'train')
-    val_prob_list, val_label_list, val_url_list = get_partition_prob_list(val_result_path_list, 'val')
-    java_test_prob_list, java_test_label_list, java_test_url_list = get_partition_prob_list(test_java_result_path_list, 'test_java')
-    python_test_prob_list, python_test_label_list, python_test_url_list = get_partition_prob_list(test_python_result_path_list, 'test_python')
+    val_prob_list, val_label_list, val_url_list = get_partition_prob_list(
+        val_result_path_list, 'val')
+    java_test_prob_list, java_test_label_list, java_test_url_list = get_partition_prob_list(
+        test_java_result_path_list, 'test_java')
+    python_test_prob_list, python_test_label_list, python_test_url_list = get_partition_prob_list(
+        test_python_result_path_list, 'test_python')
 
     # train_ensemble_model = get_data_ensemble_model(train_prob_list, train_label_list)
     print("Training ensemble model...")
@@ -714,74 +762,19 @@ def get_combined_ensemble_model():
 
 
 if __name__ == '__main__':
-    # print("Inferring variant 1...")
-    # infer_variant_1('train', 'features/feature_variant_1_train.txt', need_feature_only=True)
-    # infer_variant_1('test_java', 'features/feature_variant_1_test_java.txt', need_feature_only=True)
-    # infer_variant_1('test_python', 'features/feature_variant_1_test_python.txt', need_feature_only=True)
-    # print('-' * 64)
-    #
-    # print("Inferring variant 2...")
-    # infer_variant_2('train', 'features/feature_variant_2_train.txt', need_feature_only=True)
-    # infer_variant_2('test_java', 'features/feature_variant_2_test_java.txt', need_feature_only=True)
-    # infer_variant_2('test_python', 'features/feature_variant_2_test_python.txt', need_feature_only=True)
-    # print('-' * 64)
-    #
-
-    #
-    # print("Inferring variant 5...")
-    # infer_variant_5('train', 'features/feature_variant_5_train.txt', need_feature_only=True)
-    # infer_variant_5('test_java', 'features/prob_variant_5_test_java.txt', need_feature_only=True)
-    # infer_variant_5('test_python', 'features/prob_variant_5_test_python.txt', need_feature_only=True)
-    # print('-' * 64)
-    #
-    # print("Inferring variant 6...")
-    # infer_variant_6('train', 'features/feature_variant_6_train.txt', need_feature_only=True)
-    # infer_variant_6('test_java', 'features/feature_variant_6_test_java.txt', need_feature_only=True)
-    # infer_variant_6('test_python', 'features/feature_variant_6_test_python.txt', need_feature_only=True)
-    #
-    # print("Inferring variant 7...")
-    # infer_variant_7('val', 'features/feature_variant_7_val.txt', need_feature_only=True)
-    # infer_variant_7('test_java', 'features/feature_variant_7_test_java.txt', need_feature_only=True)
-    # infer_variant_7('test_python', 'features/feature_variant_7_test_python.txt', need_feature_only=True)
-
-    # print("Inferring variant 8...")
-    # infer_variant_8('train', 'features/feature_variant_8_train.txt', need_feature_only=True)
-    # infer_variant_8('test_java', 'features/feature_variant_8_test_java.txt', need_feature_only=True)
-    # infer_variant_8('test_python', 'features/feature_variant_8_test_python.txt', need_feature_only=True)
-
-    # print("Inferring variant 3...")
-    # infer_variant_3('train', 'features/feature_variant_3_train.txt', need_feature_only=True)
-    # infer_variant_3('test_java', 'probs/prob_variant_3_finetune_1_epoch_test_java.txt', need_feature_only=False)
-    # infer_variant_3('test_python', 'probs/prob_variant_3_finetune_1_epoch_test_python.txt', need_feature_only=False)
-
-    # print("Inferring variant 2 CNN...")
-    # infer_variant_2_cnn('train', 'features/feature_variant_2_cnn_train.txt', need_feature_only=True)
-    # infer_variant_2_cnn('test_java', 'features/feature_variant_2_cnn_test_java.txt', need_feature_only=True)
-    # infer_variant_2_cnn('test_python', 'features/feature_variant_2_cnn_test_python.txt', need_feature_only=True)
-
-
-    # print("Inferring variant 6 CNN...")
-    # infer_variant_6_cnn('train', 'features/feature_variant_6_cnn_train.txt', need_feature_only=True)
-    # infer_variant_6_cnn('test_java', 'features/feature_variant_6_cnn_test_java.txt', need_feature_only=True)
-    # infer_variant_6_cnn('test_python', 'features/feature_variant_6_cnn_test_python.txt', need_feature_only=True)
-
-    # print("Inferring variant 8 LSTM...")
-    # infer_variant_8_lstm('train', 'features/feature_variant_8_lstm_train.txt', need_feature_only=True)
-    # infer_variant_8_lstm('test_java', 'features/feature_variant_8_lstm_test_java.txt', need_feature_only=True)
-    # infer_variant_8_lstm('test_python', 'features/feature_variant_8_lstm_test_python.txt', need_feature_only=True)
-
-    # print("Inferring variant 8 GRU...")
-    # infer_variant_8_gru('train', 'features/feature_variant_8_gru_train.txt', need_feature_only=True)
-    # infer_variant_8_gru('test_java', 'features/feature_variant_8_gru_test_java.txt', need_feature_only=True)
-    # infer_variant_8_gru('test_python', 'features/feature_variant_8_gru_test_python.txt', need_feature_only=True)
-
 
     print("Inferring variant 3 FCN...")
-    infer_variant_3_fcn('train', 'features/feature_variant_3_fcn_train.txt', need_feature_only=True)
-    infer_variant_3_fcn('test_java', 'features/feature_variant_3_fcn_test_java.txt', need_feature_only=True)
-    infer_variant_3_fcn('test_python', 'features/feature_variant_3_fcn_test_python.txt', need_feature_only=True)
+    infer_variant_3_fcn(
+        'train', 'features/feature_variant_3_fcn_train.txt', need_feature_only=True)
+    infer_variant_3_fcn(
+        'test_java', 'features/feature_variant_3_fcn_test_java.txt', need_feature_only=True)
+    infer_variant_3_fcn(
+        'test_python', 'features/feature_variant_3_fcn_test_python.txt', need_feature_only=True)
 
     print("Inferring variant 7 FCN...")
-    infer_variant_7_fcn('train', 'features/feature_variant_7_fcn_train.txt', need_feature_only=True)
-    infer_variant_7_fcn('test_java', 'features/feature_variant_7_fcn_test_java.txt', need_feature_only=True)
-    infer_variant_7_fcn('test_python', 'features/feature_variant_7_fcn_test_python.txt', need_feature_only=True)
+    infer_variant_7_fcn(
+        'train', 'features/feature_variant_7_fcn_train.txt', need_feature_only=True)
+    infer_variant_7_fcn(
+        'test_java', 'features/feature_variant_7_fcn_test_java.txt', need_feature_only=True)
+    infer_variant_7_fcn(
+        'test_python', 'features/feature_variant_7_fcn_test_python.txt', need_feature_only=True)
