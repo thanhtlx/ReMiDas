@@ -140,6 +140,11 @@ def get_data():
     for url, diff_list in tqdm.tqdm(url_to_diff.items()):
         print(count, url)
         count += 1
+        file_path = os.path.join(
+            directory, EMBEDDING_DIRECTORY + '/' + url.replace('/', '_') + '.txt')
+        if os.path.isfile(file_path):
+            print(file_path)
+            continue
         for i, diff in enumerate(diff_list):
             removed_code = tokenizer.sep_token + get_code_version(diff, False)
             added_code = tokenizer.sep_token + get_code_version(diff, True)
