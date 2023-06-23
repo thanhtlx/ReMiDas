@@ -103,7 +103,8 @@ def get_line_from_code(sep_token, code):
     for line in code.split('\n'):
         if not line_empty(line):
             lines.append(sep_token + line)
-
+    if len(lines) == 0:
+        lines = [sep_token]
     return lines
 
 
